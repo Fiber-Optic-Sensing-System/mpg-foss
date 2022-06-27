@@ -10,6 +10,12 @@ fail = False
 def basic():
     print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Checking dependencies.{bcolors.ENDC}")
     try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", '--upgrade', 'pip'],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT)
+    except subprocess.SubprocessError:
+        print(f"{bcolors.OKCYAN}mpg-foss: could not update pip...{bcolors.ENDC}")
+    try:
         import wheel
     except ImportError:
         print(f"{bcolors.OKCYAN}mpg-foss: wheel not found...{bcolors.ENDC}")
@@ -24,6 +30,12 @@ def basic():
     pass
 
 def advanced():
+    try:
+        import struct
+    except ImportError:
+        print(f"{bcolors.OKCYAN}mpg-foss: struct not found...{bcolors.ENDC}")
+        print(f"{bcolors.OKCYAN}mpg-foss: installing struct...{bcolors.ENDC}")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", 'struct'])
     try:
         import usb.core
     except ImportError:
@@ -58,6 +70,11 @@ def test():
     except ImportError:
         fail = True
         print(f"{bcolors.FAIL}mpg-foss: Could not import halo. Try manually installing it. {bcolors.ENDC}")
+    try:
+        import struct
+    except ImportError:
+        fail = True
+        print(f"{bcolors.FAIL}mpg-foss: Could not import struct. Try manually installing it. {bcolors.ENDC}")
     try:
         import usb.core
     except ImportError:
