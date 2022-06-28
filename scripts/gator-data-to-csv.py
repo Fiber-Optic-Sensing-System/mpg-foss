@@ -44,6 +44,10 @@ class GatorHW:
     inum = int
     eaddr = int
 
+#TODO: Check the data structure.
+#NOTE: I believe the output of the gator to be the following:
+# - packet:[header (16 bytes), status (19 bits), sensor data (152 bits)] 299 bits, round to 38 bytes?
+# - Use bytearray e.g.: somebytes = bytearray([0x13, 0x00, 0x00, 0x00, 0x08, 0x00])
 class GatorData:
     header_len = 16
     status_len = 3
@@ -65,7 +69,7 @@ class GatorData:
     class data:
         data = [None] * 19
         cog_data = data[0:17]
-        sensor_error = data[18] #'1' == error
+        sensor_error = data[18]
 
 def get_endpoint():
     global errorStatus
