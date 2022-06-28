@@ -17,16 +17,18 @@ def basic():
         stdout=subprocess.DEVNULL,
         stderr=subprocess.STDOUT)
     except subprocess.SubprocessError:
-        print(f"{bcolors.OKCYAN}mpg-foss: could not update pip...{bcolors.ENDC}")
+        print(f"{bcolors.OKCYAN}mpg-foss: Could not update pip...{bcolors.ENDC}")
 
     for module in modules_base:
         try:
             __import__ (module)
         except ImportError:
             print(f"{bcolors.OKCYAN}mpg-foss: {module} not found...{bcolors.ENDC}")
-            print(f"{bcolors.OKCYAN}mpg-foss: installing {module}...{bcolors.ENDC}")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", module])
-    
+            print(f"{bcolors.OKCYAN}mpg-foss: Installing {module}...{bcolors.ENDC}")
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", module])
+            except subprocess.SubprocessError:
+                print(f"{bcolors.FAIL}mpg-foss: Could not acquire module named {module}. {bcolors.ENDC}")
     pass
 
 def advanced():
@@ -37,13 +39,17 @@ def advanced():
             __import__ (module)
         except ImportError:
             print(f"{bcolors.OKCYAN}mpg-foss: {module} not found...{bcolors.ENDC}")
-            print(f"{bcolors.OKCYAN}mpg-foss: installing {module}...{bcolors.ENDC}")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", module])
+            print(f"{bcolors.OKCYAN}mpg-foss: Installing {module}...{bcolors.ENDC}")
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", module])
+            except subprocess.SubprocessError:
+                print(f"{bcolors.FAIL}mpg-foss: Could not acquire module named {module}.{bcolors.ENDC}")
     pass
 
 def test():
     global modules_dependencies
     global modules_base
+    global fail
     print(f"{bcolors.HEADER}mpg-foss: Verifying...{bcolors.ENDC}")
     
     for module in modules_dependencies:
@@ -51,13 +57,13 @@ def test():
             __import__ (module)
         except ImportError:
             fail = True
-            print(f"{bcolors.FAIL}mpg-foss: Could not import {module}. Try manually installing it. {bcolors.ENDC}")
+            print(f"{bcolors.FAIL}mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
     for module in modules_base:
         try: 
             __import__ (module)
         except ImportError:
             fail = True
-            print(f"{bcolors.FAIL}mpg-foss: Could not import {module}. Try manually installing it. {bcolors.ENDC}")
+            print(f"{bcolors.FAIL}mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
     pass
 
 try:
