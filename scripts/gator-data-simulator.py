@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import statsmodels.api as sm 
+from scipy.fft import fft
 print(f"{bsymbols.info} {bcolors.FAIL}{bcolors.BOLD}mpg-foss: Not implemented yet!{bcolors.ENDC}")
 
 #ensuring the reproducibility of data values
@@ -22,6 +23,12 @@ plt.savefig('white_noise.png')
 
 #converting time series to pandas objects 
 time_series_pd = pd.Series(time_series)
+
+#Applying the Fourier Transform 
+time_series_fft = fft(time_series)
+plt.figure(figsize=(10,5))
+plt.plot(time_series_fft[0:1000])
+plt.savefig('fft_white_noise.png')
 
 
 
