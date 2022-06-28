@@ -5,9 +5,12 @@ import subprocess
 import sys
 from fosmodule import bcolors, bsymbols
 
+modules_base = ['wheel', 'halo'] 
+modules_dependencies = ['struct', 'usb.core', 'pandas', 'matplotlib', 'statsmodels', 'ttkbootstrap', 'scipy']
 fail = False
 
 def basic():
+    global modules_base
     print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Checking dependencies.{bcolors.ENDC}")
     try:
         subprocess.check_call([sys.executable, "-m", "pip", "install", '--upgrade', 'pip'],
@@ -16,45 +19,45 @@ def basic():
     except subprocess.SubprocessError:
         print(f"{bcolors.OKCYAN}mpg-foss: could not update pip...{bcolors.ENDC}")
 
-    installations = ['wheel', 'halo']
-
-    for installation in installations:
+    for module in modules_base:
         try:
-            __import__ (installation)
+            __import__ (module)
         except ImportError:
-            print(f"{bcolors.OKCYAN}mpg-foss: {installation} not found...{bcolors.ENDC}")
-            print(f"{bcolors.OKCYAN}mpg-foss: installing {installation}...{bcolors.ENDC}")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", installation])
+            print(f"{bcolors.OKCYAN}mpg-foss: {module} not found...{bcolors.ENDC}")
+            print(f"{bcolors.OKCYAN}mpg-foss: installing {module}...{bcolors.ENDC}")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", module])
     
     pass
 
 def advanced():
+    global modules_dependencies
 
-    dependencies = ['struct', 'usb.core', 'pandas', 'matplotlib', 'statsmodels', 'ttkbootstrap']
-
-    for dependency in dependencies:
+    for module in modules_dependencies:
         try:
-            
-            __import__ (dependency)
+            __import__ (module)
         except ImportError:
-            print(f"{bcolors.OKCYAN}mpg-foss: {dependency} not found...{bcolors.ENDC}")
-            print(f"{bcolors.OKCYAN}mpg-foss: installing {dependency}...{bcolors.ENDC}")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", dependency])
-
+            print(f"{bcolors.OKCYAN}mpg-foss: {module} not found...{bcolors.ENDC}")
+            print(f"{bcolors.OKCYAN}mpg-foss: installing {module}...{bcolors.ENDC}")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", module])
     pass
 
 def test():
+    global modules_dependencies
+    global modules_base
     print(f"{bcolors.HEADER}mpg-foss: Verifying...{bcolors.ENDC}")
-
-    graphics = ['halo', 'struct', 'usb.core', 'pandas', 'matplotlib', 'statsmodels', 'ttkbootstrap']
     
-    for graphic in graphics:
+    for module in modules_dependencies:
         try:
-            __import__ (graphic)
+            __import__ (module)
         except ImportError:
             fail = True
-            print(f"{bcolors.FAIL}mpg-foss: Could not import {graphic}. Try manually installing it. {bcolors.ENDC}")
-    
+            print(f"{bcolors.FAIL}mpg-foss: Could not import {module}. Try manually installing it. {bcolors.ENDC}")
+    for module in modules_base:
+        try: 
+            __import__ (module)
+        except ImportError:
+            fail = True
+            print(f"{bcolors.FAIL}mpg-foss: Could not import {module}. Try manually installing it. {bcolors.ENDC}")
     pass
 
 try:
