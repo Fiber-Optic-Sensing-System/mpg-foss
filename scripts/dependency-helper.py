@@ -48,6 +48,18 @@ def advanced():
         print(f"{bcolors.OKCYAN}mpg-foss: pandas not found...{bcolors.ENDC}")
         print(f"{bcolors.OKCYAN}mpg-foss: installing pandas...{bcolors.ENDC}")
         subprocess.check_call([sys.executable, "-m", "pip", "install", 'pandas'])
+    try:
+        import matplotlib
+    except ImportError:
+        print(f"{bcolors.OKCYAN}mpg-foss: matplotlib not found...{bcolors.ENDC}")
+        print(f"{bcolors.OKCYAN}mpg-foss: installing matplotlib...{bcolors.ENDC}")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", 'matplotlib'])
+    try:
+        import statsmodels
+    except ImportError:
+        print(f"{bcolors.OKCYAN}mpg-foss: statsmodels not found...{bcolors.ENDC}")
+        print(f"{bcolors.OKCYAN}mpg-foss: installing statsmodels...{bcolors.ENDC}")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", 'statsmodels']) 
     """
     try:
         import ttkbootstrap
@@ -85,6 +97,16 @@ def test():
     except ImportError:
         fail = True
         print(f"{bcolors.FAIL}mpg-foss: Could not import pandas. Try manually installing it. {bcolors.ENDC}")
+    try:
+        import matplotlib
+    except ImportError:
+        fail = True
+        print(f"{bcolors.FAIL}mpg-foss: Could not import matplotlib. Try manually installing it. {bcolors.ENDC}")
+    try:
+        import statsmodels
+    except ImportError:
+        fail = True
+        print(f"{bcolors.FAIL}mpg-foss: Could not import statsmodels. Try manually installing it. {bcolors.ENDC}")
     """
     try:
         import ttkbootstrap
