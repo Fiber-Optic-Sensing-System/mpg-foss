@@ -47,7 +47,7 @@ class GatorHW:
 #TODO: Check the data structure.
 #NOTE: I believe the output of the gator to be the following:
 # - packet:[header (16 bytes), status (19 bits), sensor data (152 bits)] 299 bits, round to 38 bytes?
-# - Use bytearray e.g.: somebytes = bytearray([0x13, 0x00, 0x00, 0x00, 0x08, 0x00])
+# - Use bytearray e.g.: somebytes = bytearray([0x13, 0x00, 0x00, 0x00, 0x08, 0x00]) bit bashing
 class GatorData:
     header_len = 16
     status_len = 3
