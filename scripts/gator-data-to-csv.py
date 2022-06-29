@@ -7,7 +7,7 @@ import usb.core
 #import pandas
 import argparse
 from halo import Halo
-from fosmodule import bcolors, bsymbols
+from fosmodule import bcolors, bsymbols, GatorPacket
 
 #TODO: Edit GatorHW class to use the correct device ids.
 #TODO: Check GatorData class to make sure it aligns with spec.
@@ -15,6 +15,27 @@ from fosmodule import bcolors, bsymbols
 #TODO: Implement timed collection not just one sample.
 #TODO: Output collected data into CSV file using pandas.
 
+#False inputs for testing                                                  type  version
+somedata = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))
+
+#Use methods defined in fosmodule to extract data from raw bytes.
+somepacket = GatorPacket.header()
+somepacket.data = somedata
+some_packet_payload_len = somepacket.get_payload_len()
+print(some_packet_payload_len)
+some_packet_timestamp = somepacket.get_timestamp()
+print(some_packet_timestamp)
+some_packet_num = somepacket.get_packet_num()
+print(some_packet_num)
+some_gator_type = somepacket.get_gator_type()
+print(some_gator_type)
+some_version = somepacket.get_version()
+print(some_version)
+some_sync_status = somepacket.get_sync_status()
+print(some_sync_status)
+
+
+"""
 def handle_args():
     parser = argparse.ArgumentParser(description='Run foss.py help for more information. Run foss.py deps to install dependencies.')
     parser.add_argument('-t', type=int, required=True)
@@ -140,3 +161,4 @@ try:
 except(KeyboardInterrupt, SystemExit):
     spinner.text_color = 'red'
     spinner.fail("mpg-foss: Process aborted.")
+"""

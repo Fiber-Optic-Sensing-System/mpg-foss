@@ -56,23 +56,27 @@ class GatorPacket:
 
         def get_packet_num(self):
             decode = self._data[8:10]
-            result, = struct.unpack('>I', decode)
+            result, = struct.unpack('>H', decode)
             return int(result) #This packet number
 
         def get_gator_type(self):
             decode = self._data[10]
-            result, = struct.unpack('>I', decode)
+            decode = decode.to_bytes(1, byteorder='big')
+            result, = struct.unpack('>B', decode)
             return int(result) #The type of gator connected
 
         def get_version(self):
             decode = self._data[11]
-            result, = struct.unpack('>I', decode)
+            decode = decode.to_bytes(1, byteorder='big')
+            result, = struct.unpack('>B', decode)
             return int(result) #Gator firmware version
 
+        #TODO: Needs changes 
         def get_sync_status(self):
             synced = False
             yoho = 'yoho'
             decode = self._data[12:16]
+            decode = bytes(decode)
             result, = struct.unpack('>s', decode)
             if str(result) == yoho:
                 synced = True
