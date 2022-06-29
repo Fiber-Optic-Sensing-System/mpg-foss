@@ -1,5 +1,6 @@
 #Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 #Module to contain classes for mpg-foss.
+import struct
 
 class bcolors:
     HEADER = '\033[95m'
@@ -22,6 +23,60 @@ def title():
     print(f"{bcolors.OKGREEN} / / / / / / /_/ / /_/ /_____/ __/ /_/ (__  |__  ) {bcolors.ENDC}")
     print(f"{bcolors.OKGREEN}/_/ /_/ /_/ .___/\__, /     /_/  \____/____/____/  {bcolors.ENDC}")
     print(f"{bcolors.OKGREEN}         /_/    /____/                             {bcolors.ENDC}")
+
+class GatorPacket:
+    class header:
+        def __init__(self):
+            self._len = 16
+            self._data: bytearray
+
+        @property
+        def len(self):
+            return self._len
+
+        @property
+        def data(self):
+            return self._data
+
+        @data.setter
+        def data(self, data: bytearray):
+            if not isinstance(data, bytearray):
+                raise TypeError("Data input must be a bytearray.")
+            self._data = data
+
+        def get_payload_len(self):
+            decode = self._data[0:4]
+            result, = struct.unpack('>I', decode)
+            return int(result) #Size in bytes?
+
+        def get_timestamp(self):
+            decode = self._data[4:8]
+            result, = struct.unpack('>I', decode)
+            return int(result) #Time since epoch
+
+        def get_packet_num(self):
+            decode = self._data[8:10]
+            result, = struct.unpack('>I', decode)
+            return int(result) #This packet number
+
+        def get_gator_type(self):
+            decode = self._data[10]
+            result, = struct.unpack('>I', decode)
+            return int(result) #The type of gator connected
+
+        def get_version(self):
+            decode = self._data[11]
+            result, = struct.unpack('>I', decode)
+            return int(result) #Gator firmware version
+
+        def get_sync_status(self):
+            synced = False
+            yoho = 'yoho'
+            decode = self._data[12:16]
+            result, = struct.unpack('>s', decode)
+            if str(result) == yoho:
+                synced = True
+            return synced #Returns true if synced.
 
 class zen:
     zen = [
