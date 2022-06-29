@@ -82,6 +82,20 @@ class GatorPacket:
                 synced = True
             return synced #Returns true if synced.
 
+#I have this as [17:20] because the guide indicates that "Bytes 17-19 contain the sensor status". Byte 16 is ignored?
+        def get_sensor_status(self):
+            decode = self.data[17:20]
+            result, = struct.unpack('>H', decode)
+            return int(result)
+
+        def get_num_sens_found(self):
+            decode = 
+
+        def get_sensor_data(self):
+            decode = self.data[20:44]
+            result, = struct.unpack('>H', decode)
+            return int(result)
+
 class zen:
     zen = [
     "Beautiful is better than ugly.",

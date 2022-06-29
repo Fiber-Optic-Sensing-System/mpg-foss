@@ -33,7 +33,10 @@ some_version = somepacket.get_version()
 print(some_version)
 some_sync_status = somepacket.get_sync_status()
 print(some_sync_status)
-
+some_sensor_status = somepacket.get_sensor_status()
+print(some_sensor_status)
+some_sensor_data = somepacket.get_sensor_data()
+print(some_sensor_data)
 
 """
 def handle_args():
