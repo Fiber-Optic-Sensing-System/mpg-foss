@@ -31,12 +31,8 @@ some_gator_type = somepacket.get_gator_type()
 print(some_gator_type)
 some_version = somepacket.get_version()
 print(some_version)
-some_sync_status = somepacket.get_sync_status()
-print(some_sync_status)
-some_sensor_status = somepacket.get_sensor_status()
-print(some_sensor_status)
-some_sensor_data = somepacket.get_sensor_data()
-print(some_sensor_data)
+some_characters = somepacket.get_characters()
+print(some_characters)
 
 """
 def handle_args():

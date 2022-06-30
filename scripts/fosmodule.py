@@ -70,32 +70,19 @@ class GatorPacket:
             decode = decode.to_bytes(1, byteorder='big')
             result, = struct.unpack('>B', decode)
             return int(result) #Gator firmware version
-
-        #TODO: Needs changes 
-        def get_sync_status(self):
-            synced = False
-            yoho = 'yoho'
-            decode = self._data[12:16]
-            decode = bytes(decode)
-            result, = struct.unpack('>s', decode)
-            if str(result) == yoho:
-                synced = True
-            return synced #Returns true if synced.
-
-#I have this as [17:20] because the guide indicates that "Bytes 17-19 contain the sensor status". Byte 16 is ignored?
-        def get_sensor_status(self):
-            decode = self.data[17:20]
-            result, = struct.unpack('>H', decode)
-            return int(result)
-
-        def get_num_sens_found(self):
-            decode = 
-
-        def get_sensor_data(self):
-            decode = self.data[20:44]
-            result, = struct.unpack('>H', decode)
-            return int(result)
-
+        
+        def get_characters(self):
+            status = False
+            characters = [12, 13, 14, 15]
+            yoho = "ohoy"
+            sync_str = ""
+            for character in characters:
+                char = chr(self._data[character])
+                sync_str += char
+            if yoho == sync_str:
+                status = True
+            return status
+       
 class zen:
     zen = [
     "Beautiful is better than ugly.",
