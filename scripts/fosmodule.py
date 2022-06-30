@@ -82,7 +82,39 @@ class GatorPacket:
             if yoho == sync_str:
                 status = True
             return status
-       
+  
+    """"
+    class Status:
+        def __init__(self):
+            self._len = 3
+            self._data: bytearray
+        
+        @property
+        def len(self):
+            return self._len
+
+        @property
+        def data(self):
+            return self._data
+
+        @data.setter
+        def data(self, data: bytearray):
+            if not isinstance(data, bytearray):
+                raise TypeError("Data input must be a bytearray.")
+            self._data = data
+
+        def get_num_found(self):
+            decode = self._data[17:20]
+            result, = struct.unpack('>I', decode)
+            return int(result) 
+    """
+        
+
+        
+
+
+
+
 class zen:
     zen = [
     "Beautiful is better than ugly.",
