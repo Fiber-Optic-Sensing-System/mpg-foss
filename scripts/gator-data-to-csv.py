@@ -34,6 +34,31 @@ print(some_version)
 some_characters = somepacket.get_characters()
 print(some_characters)
 
+
+class Data:
+    def __init__ (self, endpoint, buffer, time):
+        self.endpoint = endpoint 
+        self.buffer = buffer 
+        self.time = time
+        
+    def sort(self, buffer, ret_val, is_sync):
+        self.ret_val = -1
+        i = 0 
+        self.is_sync = False
+        while (not self.is_sync and i < len(self.buffer)):
+            if self.buffer[i] == 'y' and self.buffer[i+1] == 'o' and self.buffer[i+2] == 'h' and self.buffer[i+3] == 'o':
+                self.is_sync = True
+                self.ret_val = i 
+            else: 
+                i = i + 4
+                return self.ret_val
+    sort(buffer)
+
+
+
+
+
+
 """
 def handle_args():
     parser = argparse.ArgumentParser(description='Run foss.py help for more information. Run foss.py deps to install dependencies.')
