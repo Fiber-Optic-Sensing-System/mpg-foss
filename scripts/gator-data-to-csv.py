@@ -2,6 +2,7 @@
 Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
+from abc import abstractclassmethod
 import usb.core
 #import time
 #import pandas
@@ -16,11 +17,19 @@ from fosmodule import bcolors, bsymbols, GatorPacket
 #TODO: Output collected data into CSV file using pandas.
 
 #False inputs for testing                                                  type  version
-somedata = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))
+#somedata = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))          This is the actual payload data; it's all 1's
+somedata1 = bytearray((0x01, 0x01, 0x01, 0x01, 0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79)(0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01))
+#                      |   this means 15    |...didn't do 16 because that's 10000 in binary and only 4 bytes are allowed for the header(or does this not matter because each binary value = 1 bit?) 
+
+#Dictionaries for buffer data
+payloadDict = {}
+payloadDict.update({'1': somedata1[0:16]})
+
+
 
 #Use methods defined in fosmodule to extract data from raw bytes.
 somepacket = GatorPacket.header()
-somepacket.data = somedata
+somepacket.data = somedata1
 some_packet_payload_len = somepacket.get_payload_len()
 print(some_packet_payload_len)
 some_packet_timestamp = somepacket.get_timestamp()
@@ -35,26 +44,40 @@ some_characters = somepacket.get_characters()
 print(some_characters)
 
 
+
 class Data:
+
     def __init__ (self, endpoint, buffer, time):
         self.endpoint = endpoint 
         self.buffer = buffer 
         self.time = time
+        buffer = []
+
+    def read(endpoint, buffer, time): 
+        return 
         
-    def sort(self, buffer, ret_val, is_sync):
-        self.ret_val = -1
+
+    def sort(self, buffer):
+        ret_val = -1
         i = 0 
-        self.is_sync = False
-        while (not self.is_sync and i < len(self.buffer)):
-            if self.buffer[i] == 'y' and self.buffer[i+1] == 'o' and self.buffer[i+2] == 'h' and self.buffer[i+3] == 'o':
-                self.is_sync = True
-                self.ret_val = i 
+        is_sync = False
+        while (not is_sync and i < len(buffer)):
+            if buffer[i] == 'y' and buffer[i+1] == 'o' and buffer[i+2] == 'h' and buffer[i+3] == 'o':
+                is_sync = True
+                ret_val = i 
             else: 
                 i = i + 4
-                return self.ret_val
-    sort(buffer)
+                payload_end = ret_val - 12
+                payload_beginning = ret_val - 15
+                return ret_val, payload_beginning, payload_end
+
+            
+        
+    
 
 
+SortSomeData = Data()
+anAddress = SortSomeData.sort(somedata1)
 
 
 
