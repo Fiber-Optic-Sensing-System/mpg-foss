@@ -17,13 +17,13 @@ from fosmodule import bcolors, bsymbols, GatorPacket
 #TODO: Output collected data into CSV file using pandas.
 
 #False inputs for testing                                                  type  version
-#somedata = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))          This is the actual payload data; it's all 1's
-somedata1 = bytearray((0x01, 0x01, 0x01, 0x01, 0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79)(0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01))
+#lis = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))          #This is the actual payload data; it's all 1's
+lis = [0x01, 0x01, 0x01, 0x01, 0x00, 0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
 #                      |   this means 15    |...didn't do 16 because that's 10000 in binary and only 4 bytes are allowed for the header(or does this not matter because each binary value = 1 bit?) 
-
+somedata1 = bytearray(lis)
 #Dictionaries for buffer data
 payloadDict = {}
-payloadDict.update({'1': somedata1[0:16]})
+payloadDict.update({'1': somedata1[0:17]})
 
 
 
@@ -47,18 +47,18 @@ print(some_characters)
 
 class Data:
 
-    def __init__ (self, endpoint, buffer, time):
+    def __init__ (self, endpoint, buffer):
         self.endpoint = endpoint 
         self.buffer = buffer 
-        self.time = time
         buffer = []
 
     def read(endpoint, buffer, time): 
+        buffer = payloadDict
         return 
         
 
-    def sort(self, buffer):
-        ret_val = -1
+    def sort(buffer):
+        ret_val = 12
         i = 0 
         is_sync = False
         while (not is_sync and i < len(buffer)):
@@ -67,17 +67,20 @@ class Data:
                 ret_val = i 
             else: 
                 i = i + 4
-                payload_end = ret_val - 12
-                payload_beginning = ret_val - 15
+                #This gives the MSB location (should give you the byte location of where payload data begins)
+                payload_end = ret_val - 9
+                #This gives the LSB location
+                payload_beginning = ret_val - 12
                 return ret_val, payload_beginning, payload_end
 
             
         
     
+    ex = sort(lis)
+    print(ex)
 
-
-SortSomeData = Data()
-anAddress = SortSomeData.sort(somedata1)
+#SortSomeData = Data()
+#anAddress = SortSomeData.sort(somedata1)
 
 
 
