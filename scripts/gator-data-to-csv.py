@@ -17,14 +17,14 @@ from fosmodule import bcolors, bsymbols, GatorPacket
 #TODO: Output collected data into CSV file using pandas.
 
 #False inputs for testing                                                  type  version
-#lis = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))          #This is the actual payload data; it's all 1's
-lis = [0x01, 0x01, 0x01, 0x01, 0x00, 0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
+lis = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))          #This is the actual payload data; it's all 1's
+#lis = [0x01, 0x01, 0x01, 0x01, 0x00, 0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
 #                      |   this means 15    |...didn't do 16 because that's 10000 in binary and only 4 bytes are allowed for the header(or does this not matter because each binary value = 1 bit?) 
 somedata1 = bytearray(lis)
 #Dictionaries for buffer data
-payloadDict = {}
-payloadDict.update({'1': somedata1[0:17]})
 
+payloadDict = {}
+CoG_Data = {}
 
 
 #Use methods defined in fosmodule to extract data from raw bytes.
@@ -58,26 +58,33 @@ class Data:
         
 
     def sort(buffer):
-        ret_val = 12
+        ret_val = 0
         i = 0 
         is_sync = False
         while (not is_sync and i < len(buffer)):
             if buffer[i] == 'y' and buffer[i+1] == 'o' and buffer[i+2] == 'h' and buffer[i+3] == 'o':
                 is_sync = True
-                ret_val = i 
+                ret_val = i - 15
             else: 
                 i = i + 4
-                #This gives the MSB location (should give you the byte location of where payload data begins)
-                payload_end = ret_val - 9
+        #This gives the MSB location (should give you the byte location of where payload data begins)
+        payload_beginning = i + 1
+        payload_end = somepacket.get_payload_len() + payload_beginning
                 #This gives the LSB location
-                payload_beginning = ret_val - 12
-                return ret_val, payload_beginning, payload_end
+        global payloadDict
+        payloadDict.update({somepacket.get_packet_num(): somedata1[payload_beginning:payload_end]})
+        global CoG_Data
+        timestamp_beginning = ret_val + 4
+        timestamp_end = somepacket.get_timestamp() + timestamp_beginning
+        CoG_Data.update({somepacket.get_packet_num(): somedata1[timestamp_beginning:timestamp_end]})
+        return ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end
 
             
         
     
     ex = sort(lis)
     print(ex)
+    print('(ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end)')
 
 #SortSomeData = Data()
 #anAddress = SortSomeData.sort(somedata1)
