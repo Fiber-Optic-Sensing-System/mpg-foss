@@ -83,7 +83,7 @@ class GatorPacket:
                 status = True
             return status
   
-    """"
+
     class Status:
         def __init__(self):
             self._len = 3
@@ -107,7 +107,32 @@ class GatorPacket:
             decode = self._data[17:20]
             result, = struct.unpack('>I', decode)
             return int(result) 
-    """
+
+    class data: 
+
+        def __init__(self):
+            self._len = 23
+            self._data: bytearray
+
+        @property
+        def len(self):
+            return self._len
+
+        @property
+        def data(self):
+            return self._data
+
+        @data.setter
+        def data(self, data: bytearray):
+            if not isinstance(data, bytearray):
+                raise TypeError("Data input must be a bytearray.")
+            self._data = data
+
+        def get_cog_data(self): 
+            decode = self._data[20:44]
+            result, = struct.unpack('>I', decode)
+            return int(result)
+
         
 
         

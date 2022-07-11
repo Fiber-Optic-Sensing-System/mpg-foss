@@ -3,6 +3,7 @@ Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
 from abc import abstractclassmethod
+from ast import Global
 import usb.core
 #import time
 #import pandas
@@ -20,16 +21,16 @@ from fosmodule import bcolors, bsymbols, GatorPacket
 lis = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))          #This is the actual payload data; it's all 1's
 #lis = [0x01, 0x01, 0x01, 0x01, 0x00, 0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
 #                      |   this means 15    |...didn't do 16 because that's 10000 in binary and only 4 bytes are allowed for the header(or does this not matter because each binary value = 1 bit?) 
-somedata1 = bytearray(lis)
+somedata = bytearray(lis)
 #Dictionaries for buffer data
 
 payloadDict = {}
-CoG_Data = {}
+cog_data_dict = {}
 
 
 #Use methods defined in fosmodule to extract data from raw bytes.
 somepacket = GatorPacket.header()
-somepacket.data = somedata1
+somepacket.data = somedata
 some_packet_payload_len = somepacket.get_payload_len()
 print(some_packet_payload_len)
 some_packet_timestamp = somepacket.get_timestamp()
@@ -42,6 +43,12 @@ some_version = somepacket.get_version()
 print(some_version)
 some_characters = somepacket.get_characters()
 print(some_characters)
+
+
+datapacket = GatorPacket.data()
+datapacket.data = somedata
+cog_data = datapacket.get_cog_data()
+print(cog_data)
 
 
 
@@ -72,19 +79,33 @@ class Data:
         payload_end = somepacket.get_payload_len() + payload_beginning
                 #This gives the LSB location
         global payloadDict
-        payloadDict.update({somepacket.get_packet_num(): somedata1[payload_beginning:payload_end]})
-        global CoG_Data
+        payloadDict.update({somepacket.get_packet_num(): somedata[payload_beginning:payload_end]})
         timestamp_beginning = ret_val + 4
         timestamp_end = somepacket.get_timestamp() + timestamp_beginning
-        CoG_Data.update({somepacket.get_packet_num(): somedata1[timestamp_beginning:timestamp_end]})
         return ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end
 
-            
-        
+    def sortcog(cog_data_dict, payload_beginning, payload_end):
+        cog_data_beginning = payload_beginning + 3
+        cog_data_end = payload_beginning + 26
+        cog_data_status = False
+        if (cog_data_end == payload_end): 
+            cog_data_status = True 
+            if cog_data_status == 'True' :
+                cog_data_dict.update({somepacket.get_packet_num(): somedata[cog_data_beginning:cog_data_end]})
+        return cog_data_beginning, cog_data_end
+
+
+
+
+    
     
     ex = sort(lis)
     print(ex)
-    print('(ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end)')
+    sortcog(cog_data_dict, ex[1])
+
+    #print(CoG_Data)
+    #print(payloadDict)
+    #print('(ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end)')
 
 #SortSomeData = Data()
 #anAddress = SortSomeData.sort(somedata1)
