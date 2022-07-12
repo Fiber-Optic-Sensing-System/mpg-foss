@@ -105,7 +105,7 @@ class GatorPacket:
 
         def get_num_found(self):
             decode = self._data[17:20]
-            result, = struct.unpack('>I', decode)
+            result, = struct.unpack('>c', decode)
             return int(result) 
 
     class data: 
@@ -129,12 +129,15 @@ class GatorPacket:
             self._data = data
 
         def get_cog_data(self): 
-            decode = self._data[20:44]
-            decode = decode.to_bytes(1, byteorder='big')
+            x = 20 
+            while x < 44: 
+                x = x + 4
+                decode = self._data[x-4:x]
+            
+            #decode = self._data[20:24]
             result, = struct.unpack('>I', decode)
             return int(result)
-
-        
+    
 
         
 

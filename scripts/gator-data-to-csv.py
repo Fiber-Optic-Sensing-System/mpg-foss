@@ -100,7 +100,8 @@ class Data:
     
     ex = sort(lis)
     print(ex)
-    sortcog(cog_data_dict, ex[1])
+    cogsorted = sortcog(cog_data_dict, ex[1], ex[2])
+    print(cogsorted)
 
     #print(CoG_Data)
     #print(payloadDict)
