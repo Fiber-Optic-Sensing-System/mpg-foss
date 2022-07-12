@@ -130,6 +130,7 @@ class GatorPacket:
 
         def get_cog_data(self): 
             decode = self._data[20:44]
+            decode = decode.to_bytes(1, byteorder='big')
             result, = struct.unpack('>I', decode)
             return int(result)
 

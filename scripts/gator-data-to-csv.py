@@ -18,7 +18,7 @@ from fosmodule import bcolors, bsymbols, GatorPacket
 #TODO: Output collected data into CSV file using pandas.
 
 #False inputs for testing                                                  type  version
-lis = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79))          #This is the actual payload data; it's all 1's
+lis = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x00, 0x00, 0x03, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01))
 #lis = [0x01, 0x01, 0x01, 0x01, 0x00, 0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01]
 #                      |   this means 15    |...didn't do 16 because that's 10000 in binary and only 4 bytes are allowed for the header(or does this not matter because each binary value = 1 bit?) 
 somedata = bytearray(lis)
@@ -74,10 +74,8 @@ class Data:
                 ret_val = i - 15
             else: 
                 i = i + 4
-        #This gives the MSB location (should give you the byte location of where payload data begins)
         payload_beginning = i + 1
         payload_end = somepacket.get_payload_len() + payload_beginning
-                #This gives the LSB location
         global payloadDict
         payloadDict.update({somepacket.get_packet_num(): somedata[payload_beginning:payload_end]})
         timestamp_beginning = ret_val + 4
@@ -85,13 +83,14 @@ class Data:
         return ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end
 
     def sortcog(cog_data_dict, payload_beginning, payload_end):
+        #global cog_data_dict
         cog_data_beginning = payload_beginning + 3
         cog_data_end = payload_beginning + 26
         cog_data_status = False
         if (cog_data_end == payload_end): 
             cog_data_status = True 
             if cog_data_status == 'True' :
-                cog_data_dict.update({somepacket.get_packet_num(): somedata[cog_data_beginning:cog_data_end]})
+                cog_data_dict.update({datapacket.get_cog_data(): somedata[cog_data_beginning:cog_data_end]})
         return cog_data_beginning, cog_data_end
 
 
