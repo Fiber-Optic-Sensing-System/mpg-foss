@@ -128,15 +128,32 @@ class GatorPacket:
                 raise TypeError("Data input must be a bytearray.")
             self._data = data
 
+        def access_bit(self, data, num):
+            base = int(num // 8)
+            shift = int(num % 8)
+            return (data[base] >> shift) & 0x1
+
         def get_cog_data(self): 
-            x = 20 
-            while x < 44: 
-                x = x + 4
-                decode = self._data[x-4:x]
+            decode = self._data[20:44]
+            as_string = bytes(decode)
+            print(as_string)
+            bytes_as_bits = [self.access_bit(decode, i) for i in range (len(decode)*8)]
+            print(bytes_as_bits)
+            print("Length: ", len(bytes_as_bits))
+            cog_length = len(decode)/23
             
-            #decode = self._data[20:24]
-            result, = struct.unpack('>I', decode)
-            return int(result)
+            sensor_1 = bytes_as_bits[0:19]
+            sensor_2 = bytes_as_bits[19:38]
+            sensor_3 = bytes_as_bits[38:57]
+            sensor_4 = bytes_as_bits[57:76]
+            sensor_5 = bytes_as_bits[76:95]
+            sensor_6 = bytes_as_bits[95:114]
+            sensor_7 = bytes_as_bits[114:133]
+            sensor_8 = bytes_as_bits[133:152]
+            sensor_9 = bytes_as_bits[152:171]
+            all_sensors = [sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9]
+            print("\nSensor 1:", sensor_1, "Length:", len(sensor_1), "\nSensor 2:", sensor_2, "Length:", len(sensor_2), "\nSensor 3:", sensor_3, "Length:", len(sensor_3), "\nSensor 4:", sensor_4, "Length:", len(sensor_5), "\nSensor 5:", sensor_5, "Length:", len(sensor_5), "\nSensor 6:", sensor_6, "Length:", len(sensor_6),"\nSensor 7:", sensor_7, "Length:", len(sensor_7), "\nSensor 8:", sensor_8, "Length:", len(sensor_8), "\nSensor 9:", sensor_9, "Length:", len(sensor_9),)
+            return all_sensors
     
 
         
