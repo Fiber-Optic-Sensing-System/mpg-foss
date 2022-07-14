@@ -18,7 +18,9 @@ from fosmodule import bcolors, bsymbols, GatorPacket
 #TODO: Output collected data into CSV file using pandas.
 
 #False inputs for testing                                                  type  version
-lis = bytearray((0x00,0x01,0x51,0x94,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x00, 0x00, 0x03, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01))
+#fakelis = bytearray((0x00, 0x00, 0x00, 0x2B))                                                                                                                                                                                   second packet of data begins on new line           
+lis = bytearray((0x00,0x00,0x00,0x2B,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x00, 0x00, 0x03, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01)) 
+#0x00,0x00,0x00,0x2B,0x00,0x4c,0x4b,0x40, 0x01, 0x00, 0x01, 0x00, 0x6f, 0x68, 0x6f, 0x79, 0x00, 0x00, 0x03, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 ))
 somedata = bytearray(lis)
 
 
@@ -64,31 +66,32 @@ class Data:
         
 
     def sort(buffer):
-        ret_val = 0
-        i = 0 
+        ret_val = -1
+        i = -1 
         is_sync = False
         while (not is_sync and i < len(buffer)):
             if buffer[i] == 'y' and buffer[i+1] == 'o' and buffer[i+2] == 'h' and buffer[i+3] == 'o':
                 is_sync = True
                 ret_val = i - 15
-            else: 
+            else:
                 i = i + 4
-        payload_beginning = i + 1
-        payload_end = somepacket.get_payload_len() + payload_beginning
-        global payloadDict
+                    
+        if is_sync == False: 
+            print("yoho not found")
+        print(i)
+        payload_beginning = i - 27
+        payload_end = somepacket.get_payload_len() 
         payloadDict.update({somepacket.get_packet_num(): somedata[payload_beginning:payload_end]})
-        timestamp_beginning = ret_val + 4
+        timestamp_beginning = ret_val + 1
         timestamp_end = somepacket.get_timestamp() + timestamp_beginning
         return ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end
 
-    def sortcog(cog_data_dict, payload_beginning, payload_end):
+    def sortcog(timestamp, payload_beginning, payload_end):
         cog_data_beginning = payload_beginning + 3
-        cog_data_end = payload_beginning + 26
-        cog_data_status = False
+        cog_data_end = payload_beginning + 27
         if (cog_data_end == payload_end): 
-            cog_data_status = True 
-            if cog_data_status == 'True' :
-                cog_data_dict.update({datapacket.get_cog_data(): somedata[cog_data_beginning:cog_data_end]})
+            some_data_slice = somedata[cog_data_beginning:cog_data_end]
+            cog_data_dict[timestamp] = some_data_slice
         return cog_data_beginning, cog_data_end
 
 
@@ -98,9 +101,10 @@ class Data:
     
     ex = sort(lis)
     print(ex)
-    cogsorted = sortcog(cog_data_dict, ex[1], ex[2])
+    cogsorted = sortcog(ex[4], ex[1], ex[2])
     print(cogsorted)
-
+    print(cog_data_dict)
+    
     
 """
 def handle_args():
