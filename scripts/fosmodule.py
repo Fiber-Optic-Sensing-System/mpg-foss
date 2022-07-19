@@ -141,34 +141,20 @@ class GatorPacket:
             print(bytes_as_bits)
             print("Length: ", len(bytes_as_bits))
             cog_length = len(decode)/23
-            """
-            x = 0
-            while x < 10000:
-                y = x + 19
-                sensor = bytes_as_bits[x:y] 
-            """   
             
             
             sensor_1 = bytes_as_bits[0:19]
             sensor_2 = bytes_as_bits[19:38]
             sensor_3 = bytes_as_bits[38:57]
-            sensor_4 = bytes_as_bits[57:76]
-            sensor_5 = bytes_as_bits[76:95]
-            sensor_6 = bytes_as_bits[95:114]
-            sensor_7 = bytes_as_bits[114:133]
-            sensor_8 = bytes_as_bits[133:152]
-            sensor_9 = bytes_as_bits[152:171]
-            sensor_10 = bytes_as_bits[171:190]
-            sensor_11 = bytes_as_bits[190:209]
-            sensor_12 = bytes_as_bits[209:228]
-            sensor_13 = bytes_as_bits[228:247]
+            
         
-            all_sensors = [sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10, sensor_11, sensor_12, sensor_13]
-           
+            all_sensors = [sensor_1, sensor_2, sensor_3]
+            
+       
             number_of_sensors = 0
             for sensor_num in all_sensors: 
                 number_of_sensors = number_of_sensors + 1
-                print("\nSensor", number_of_sensors, ":", sensor_num, "Length:", len(sensor_num), "bits")
+                print("\nsensor", number_of_sensors, ":", sensor_num, "Length:", len(sensor_num), "sensors")
 
             return all_sensors, print("There are", len(all_sensors), "sensors being recognized")
             
