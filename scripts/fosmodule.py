@@ -113,6 +113,7 @@ class GatorPacket:
         def __init__(self):
             self._len = 23
             self._data: bytearray
+            self._num_sensors = 8
 
         @property
         def len(self):
@@ -136,27 +137,18 @@ class GatorPacket:
         def get_cog_data(self): 
             decode = self._data[20:44]
             as_string = bytes(decode)
-            print(as_string)
+            #print(as_string)
             bytes_as_bits = [self.access_bit(decode, i) for i in range (len(decode)*8)]
-            print(bytes_as_bits)
-            print("Length: ", len(bytes_as_bits))
-            cog_length = len(decode)/23
-            
-            
-            sensor_1 = bytes_as_bits[0:19]
-            sensor_2 = bytes_as_bits[19:38]
-            sensor_3 = bytes_as_bits[38:57]
-            
-        
-            all_sensors = [sensor_1, sensor_2, sensor_3]
-            
-       
-            number_of_sensors = 0
-            for sensor_num in all_sensors: 
-                number_of_sensors = number_of_sensors + 1
-                print("\nsensor", number_of_sensors, ":", sensor_num, "Length:", len(sensor_num), "sensors")
-
-            return all_sensors, print("There are", len(all_sensors), "sensors being recognized")
+            #print(bytes_as_bits)
+            #print("Length: ", len(bytes_as_bits))
+            sensors = []
+            for sensor in range(self._num_sensors):
+                x = 0
+                y = 19
+                sensors.append(bytes_as_bits[x:y])
+                x += 19
+                y += 19
+            return sensors
             
 
         
