@@ -2,13 +2,8 @@
 Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
-from abc import abstractclassmethod
-from ast import Global
-import usb.core
-#import time
+
 import pandas as pd
-import argparse
-import csv
 from halo import Halo
 from fosmodule import bcolors, bsymbols, GatorPacket
 
@@ -58,69 +53,6 @@ for sensor in cog_data:
     i += 1
 
 print("-----------------------------------------------------")
-
-
-
-
-class Data:
-
-    def __init__ (self, endpoint, buffer):
-        self.endpoint = endpoint 
-        self.buffer = buffer 
-        buffer = []
-
-    def read(endpoint, buffer, time): 
-        buffer = payloadDict
-        return 
-        
-
-    def sort(buffer):
-        value = 0
-        if value < len(lis):
-            ret_val = -1
-            i = -1 
-            is_sync = False
-            while (not is_sync and i < len(buffer)):
-                if buffer[i] == 'y' and buffer[i+1] == 'o' and buffer[i+2] == 'h' and buffer[i+3] == 'o':
-                    is_sync = True
-                    ret_val = i - 15
-                else:
-                    i = i + 4
-                    
-            if is_sync == False: 
-                print("yoho not found")
-            #print(i)
-            print(ret_val, "This is ret val")
-            payload_beginning = i - 27
-            payload_end = somepacket.get_payload_len() 
-            payloadDict.update({somepacket.get_packet_num(): somedata[payload_beginning:payload_end]})
-            timestamp_beginning = ret_val + 1
-            timestamp_end = somepacket.get_timestamp() + timestamp_beginning
-            return ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end
-        else: 
-            value = value + 1
-
-    def sortcog(timestamp, payload_beginning, payload_end):
-        value2 = 0 
-        if value2 < len(lis):
-            cog_data_beginning = payload_beginning + 3
-            cog_data_end = payload_beginning + 27
-            if (cog_data_end == payload_end): 
-                some_data_slice = somedata[cog_data_beginning:cog_data_end]
-                cog_data_dict[timestamp] = some_data_slice
-            return cog_data_beginning, cog_data_end
-        else: 
-            value2 = value2 + 1
-
-    ex = sort(lis)
-    #print(ex)
-    cogsorted = sortcog(ex[4], ex[1], ex[2])
-    #print(cogsorted)
-    #print(cog_data_dict)
-
-
-#df = pd.DataFrame(cog_data_dict, columns = 'Data')
-#df.to_csv('foss_test_data.csv')
 
 """
 def handle_args():
