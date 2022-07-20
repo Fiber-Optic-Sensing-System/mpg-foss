@@ -1,6 +1,6 @@
 #Written by Caleb C. & Andrew V. in 2022 for Carthage Space Sciences | WSGC | NASA
 #Simulates gator data for the purposes of testing.
-from fosmodule import bcolors, bsymbols
+from formatmodule import bcolors, bsymbols
 import struct
 import pandas as pd 
 import numpy as np

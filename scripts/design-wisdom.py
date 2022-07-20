@@ -3,7 +3,7 @@
 #The zen array of strings in fosmodule can be used for testing purposes.
 import time
 from halo import Halo
-from fosmodule import bcolors, zen
+from formatmodule import bcolors, zen
 
 spinner = Halo(spinner='dots')
 try:

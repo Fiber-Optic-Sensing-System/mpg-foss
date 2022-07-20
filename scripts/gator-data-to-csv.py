@@ -4,7 +4,8 @@ Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
 import pandas as pd
 from halo import Halo
-from fosmodule import bcolors, bsymbols, GatorPacket, packetsim
+from formatmodule import bcolors, bsymbols
+from fosmodule import GatorPacket, packetsim
 
 #TODO: Edit GatorHW class to use the correct device ids.
 #TODO: Check GatorData class to make sure it aligns with spec.

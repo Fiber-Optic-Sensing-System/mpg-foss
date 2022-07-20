@@ -3,7 +3,7 @@
 #This script will get the dependencies for fossS/MPG related Python projects.
 import subprocess
 import sys
-from fosmodule import bcolors, bsymbols
+from formatmodule import bcolors, bsymbols
 
 modules_base = ['wheel', 'halo'] 
 modules_dependencies = ['struct', 'usb.core', 'pandas', 'matplotlib', 'statsmodels', 'ttkbootstrap', 'scipy', 'bitarray']
