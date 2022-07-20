@@ -3,7 +3,7 @@
 import random
 import struct
 import time
-from bitarray import bitarray
+#from bitarray import bitarray
 
 class bcolors:
     HEADER = '\033[95m'
