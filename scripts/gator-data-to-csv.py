@@ -53,9 +53,9 @@ for sensor in cog_data:
 
 print("-----------------------------------------------------")
 simpacket = packetsim()
-some_bytes = simpacket.generate_packets(2)
-#print("Raw packet:", some_bytes.hex())
-print("Raw packet:", some_bytes)
+some_bytes = simpacket.generate_packets(25)
+print("Raw packet(s):", some_bytes.hex())
+#print("Raw packet:", some_bytes)
 print("-----------------------------------------------------")
 
 """

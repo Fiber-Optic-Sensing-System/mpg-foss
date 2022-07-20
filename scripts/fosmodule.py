@@ -1,8 +1,5 @@
 #Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 #Module to contain classes for mpg-foss.
-import random
-import struct
-import time
 #from bitarray import bitarray
 
 class bcolors:
@@ -29,6 +26,7 @@ def title():
 
 class GatorPacket:
     class header:
+        import struct
         def __init__(self):
             self._len = 16
             self._data: bytearray
@@ -49,29 +47,29 @@ class GatorPacket:
 
         def get_payload_len(self):
             decode = self._data[0:4]
-            result, = struct.unpack('>I', decode)
+            result, = self.struct.unpack('>I', decode)
             return int(result) #Size in bytes?
 
         def get_timestamp(self):
             decode = self._data[4:8]
-            result, = struct.unpack('>I', decode)
+            result, = self.struct.unpack('>I', decode)
             return int(result) #Time since epoch
 
         def get_packet_num(self):
             decode = self._data[8:10]
-            result, = struct.unpack('>H', decode)
+            result, = self.struct.unpack('>H', decode)
             return int(result) #This packet number
 
         def get_gator_type(self):
             decode = self._data[10]
             decode = decode.to_bytes(1, byteorder='big')
-            result, = struct.unpack('>B', decode)
+            result, = self.struct.unpack('>B', decode)
             return int(result) #The type of gator connected
 
         def get_version(self):
             decode = self._data[11]
             decode = decode.to_bytes(1, byteorder='big')
-            result, = struct.unpack('>B', decode)
+            result, = self.struct.unpack('>B', decode)
             return int(result) #Gator firmware version
         
         def get_characters(self):
@@ -88,6 +86,7 @@ class GatorPacket:
   
 
     class Status:
+        import struct
         def __init__(self):
             self._len = 3
             self._data: bytearray
@@ -108,11 +107,10 @@ class GatorPacket:
 
         def get_num_found(self):
             decode = self._data[17:20]
-            result, = struct.unpack('>c', decode)
+            result, = self.struct.unpack('>c', decode)
             return int(result) 
 
     class data: 
-
         def __init__(self):
             self._len = 23
             self._data: bytearray
@@ -189,11 +187,15 @@ class GatorPacket:
 
 #This class is used for generating fake gator packets.
 class packetsim:
+    import struct
+    import time
+    import bitarray
+    import random
     def __init__(self):
         self._num_sensors = 8
         self._packet_num = 0
         self._timestamp = 0
-        self._payload_size = 43
+        self._payload_size = 27
         self._header = {
             "yoho": "yoho",
             "version": 0,
@@ -206,9 +208,39 @@ class packetsim:
 
         }
 
+    def generate_status_word(self):
+        status_word = self.bitarray.bitarray(24)
+        status_word.setall(0)
+        #Bit at 0 appears to always be one.
+        status_word[0] = 1
+        #Bit at 4 should be 1 for 0b1000 aka 8
+        status_word[4] = 1
+        #Set bits 5-12 to 1 for sensorx OK status
+        for i in range(7):
+            status_word[i+5] = 1
+        #Set temp ok to 1
+        status_word[13] = 1
+        #Set bits 14-18 to rand for sequence num
+        for i in range(4):
+            status_word[i+14] = self.random.randint(0, 1)
+        retval = bytearray()
+        retval.extend(status_word.tobytes())
+        return retval
+
     def generate_cog_data(self):
-        print(f"{bsymbols.info} {bcolors.FAIL}mpg-foss: cog data gen not implemented yet...{bcolors.ENDC}")
-    
+        #24 bytes of data
+        retval = bytearray()
+        for sensor in range(8):
+            cog_data = self.bitarray.bitarray(24)
+            cog_data.setall(0)
+            #Sensor data 0-17 random bits
+            for bit in range(17):
+                cog_data[bit] = self.random.randint(0, 1)
+            #Set sensor error to 0
+            cog_data[18] = 0
+            retval.extend(cog_data.tobytes())
+        return retval
+
     #Adds one to the packet number and returns it.
     def get_and_incriment_pkt(self):
         self._packet_num += 1
@@ -216,7 +248,7 @@ class packetsim:
 
     #Gets the program time and returns it as a float.
     def create_and_get_timestamp(self):
-        self._timestamp = time.perf_counter()
+        self._timestamp = self.time.perf_counter()
         return self._timestamp
 
     #Returns the size of the packet payload in bytes.
@@ -226,7 +258,7 @@ class packetsim:
     #Helper function to pack strings.
     def string_packer(self, string):
         string = bytes(string, 'utf-8')
-        retval = struct.pack('>{}s'.format(len(string)), string)
+        retval = self.struct.pack('>{}s'.format(len(string)), string)
         return retval
     
     #Generates a single packet.
@@ -237,33 +269,32 @@ class packetsim:
         self._header["pkt_num"] = self.get_and_incriment_pkt()
         self._header["timestamp"] = self.create_and_get_timestamp()
         self._header["payload_size"] = self.get_payload_size()
-        #TODO: Add dynamic/generated values to status.
-        #Add dynamic/generated values to cog data.
-        self.generate_cog_data()
+        self._status["sensor_status"] = self.generate_status_word()
+        self._cog_data["cog_data"] = self.generate_cog_data()
         #Add the yoho value to the packet.
         intermediate = self.string_packer(self._header.get('yoho'))
-        for byte in intermediate:
-            raw_packet.append(byte)
+        for byte in intermediate : raw_packet.append(byte)
         #Add the version number to the packet.
-        intermediate = struct.pack('>B', self._header.get('version'))
-        for byte in intermediate:
-            raw_packet.append(byte)
+        intermediate = self.struct.pack('>B', self._header.get('version'))
+        for byte in intermediate : raw_packet.append(byte)
         #Add the type number to the packet.
-        intermediate = struct.pack('>B', self._header.get('type'))
-        for byte in intermediate:
-            raw_packet.append(byte)
+        intermediate = self.struct.pack('>B', self._header.get('type'))
+        for byte in intermediate : raw_packet.append(byte)
         #Add the packet number to the packet.
-        intermediate = struct.pack('>H', self._header.get('pkt_num'))
-        for byte in intermediate:
-            raw_packet.append(byte)
+        intermediate = self.struct.pack('>H', self._header.get('pkt_num'))
+        for byte in intermediate : raw_packet.append(byte)
         #Add the time stamp to the packet.
-        intermediate = struct.pack('>f', self._header.get('timestamp'))
-        for byte in intermediate:
-            raw_packet.append(byte)
+        intermediate = self.struct.pack('>f', self._header.get('timestamp'))
+        for byte in intermediate : raw_packet.append(byte)
         #Add the payload size to the packet.
-        intermediate = struct.pack('>I', self._header.get('payload_size'))
-        for byte in intermediate:
-            raw_packet.append(byte)
+        intermediate = self.struct.pack('>I', self._header.get('payload_size'))
+        for byte in intermediate : raw_packet.append(byte)
+        #Add the status word to the packet.
+        intermediate = self._status.get('sensor_status')
+        for byte in intermediate : raw_packet.append(byte)
+        #Add the cog data to the packet.
+        intermediate = self._cog_data.get('cog_data')
+        for byte in intermediate : raw_packet.append(byte)
         #Return the generated packet.
         return raw_packet
 
