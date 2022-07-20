@@ -2,10 +2,9 @@
 Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
-
 import pandas as pd
 from halo import Halo
-from fosmodule import bcolors, bsymbols, GatorPacket
+from fosmodule import bcolors, bsymbols, GatorPacket, packetsim
 
 #TODO: Edit GatorHW class to use the correct device ids.
 #TODO: Check GatorData class to make sure it aligns with spec.
@@ -53,6 +52,11 @@ for sensor in cog_data:
     i += 1
 
 print("-----------------------------------------------------")
+simpacket = packetsim()
+some_bytes = simpacket.generate_packets(2)
+#print("Raw packet:", some_bytes.hex())
+print("Raw packet:", some_bytes)
+print("-----------------------------------------------------")
 
 """
 def handle_args():
@@ -61,56 +65,17 @@ def handle_args():
     parser.add_argument('-o', type=str, required=True)
     args = parser.parse_args()
     return args
+"""
 
+"""
 spinner = Halo(spinner='dots')
 errorStatus = False
 collectDuration = 0
 fileName = ""
 outputPath = ""
+"""
 
-def set_params(args):
-    global collectDuration
-    global fileName
-    global outputPath
-    collectDuration = args.t
-    fileName = args.o
-    outputPath = "./data/" + fileName + ".csv"
-
-class GatorHW:
-    v_id = 0x045e
-    p_id = 0x0040
-    dev = usb.core.Device
-    ep = usb.core.Endpoint
-    inum = int
-    eaddr = int
-
-#TODO: Check the data structure.
-#NOTE: I believe the output of the gator to be the following:
-# - packet:[header (16 bytes), status (19 bits), sensor data (152 bits)] 299 bits, round to 38 bytes?
-# - Use bytearray e.g.: somebytes = bytearray([0x13, 0x00, 0x00, 0x00, 0x08, 0x00]) bit bashing
-class GatorData:
-    header_len = 16
-    status_len = 3
-    data_len = 23 
-    class header:
-        data = [None] * 16
-        payload_size = data[0:3]
-        time_stamp = data[4:7]
-        pkt_count = data[8:9]
-        gator_type = data[10]
-        gator_version = data[11]
-        sync = data[12:15]
-    class status:
-        data = [None] * 19
-        num_sens_found = data[1:4]
-        sensor_ok = data[5:12]
-        tec_temp_ok = data[13]
-        sequence_num = data[14:18]
-    class data:
-        data = [None] * 19
-        cog_data = data[0:17]
-        sensor_error = data[18]
-
+"""
 def get_endpoint():
     global errorStatus
     try:
@@ -119,8 +84,9 @@ def get_endpoint():
         GatorHW.i = GatorHW.dev[0].interfaces()[0].bInterfaceNumber
     except:
         errorStatus = 1
+"""
 
-
+"""
 def configuratuion():
     global errorStatus
     try:
@@ -131,7 +97,9 @@ def configuratuion():
         GatorHW.eaddr = GatorHW.ep.bEndpointAddress
     except:
         errorStatus = 1
+"""
 
+"""
 def read_data(len):
     global errorStatus
     try:
@@ -139,6 +107,7 @@ def read_data(len):
         return data
     except:
         errorStatus = 1
+"""
 
 def error_check():
     global errorStatus
@@ -152,6 +121,7 @@ def error_check():
         spinner.succeed("mpg-foss: success!")
     spinner.start()
 
+"""
 #Run
 try:
     args = handle_args()
