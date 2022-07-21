@@ -39,20 +39,23 @@ try:
         errorStatus = True
     error_check()
     #Use methods defined in fosmodule to extract data from raw bytes.
-    somepacket = gatorpacket.header()
-    somepacket.data = somedata
+    somepacket = gatorpacket()
+    somepacket.header.data = somedata
     #print(somepacket.data.hex()) #Debug
     print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Parsing packets...{bcolors.ENDC}")
-    yoho = somepacket.get_characters()
+    yoho = somepacket.header.get_characters()
     if(yoho == False):
         errorStatus = True
     error_check()
-    some_packet_payload_len = somepacket.get_payload_len()
-    some_packet_timestamp = somepacket.get_timestamp()
-    some_packet_num = somepacket.get_packet_num()
-    some_gator_type = somepacket.get_gator_type()
-    some_version = somepacket.get_version()
+    ### Get data from packet ###
+    some_packet_payload_len = somepacket.header.get_payload_len()
+    some_packet_timestamp = somepacket.header.get_timestamp()
+    some_packet_num = somepacket.header.get_packet_num()
+    some_gator_type = somepacket.header.get_gator_type()
+    some_version = somepacket.header.get_version()
+    
     spinner.stop()
+    ### Print data from packet ###
     print(f" Packet num: {some_packet_num} -> recorded at {some_packet_timestamp}μs collection time.")
     print(f" DEBUG: Payload len: {some_packet_payload_len} bytes | Gator type: {some_gator_type} | Gator version: {some_version}") #Debug
 
