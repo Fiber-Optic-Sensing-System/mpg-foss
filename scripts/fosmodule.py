@@ -1,7 +1,7 @@
 #Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 #Module to contain classes for mpg-foss.
 
-class GatorPacket:
+class gatorpacket:
     class header:
         import struct
         def __init__(self):
@@ -29,8 +29,8 @@ class GatorPacket:
 
         def get_timestamp(self):
             decode = self._data[4:8]
-            result, = self.struct.unpack('>I', decode)
-            return int(result) #Time since epoch
+            result, = self.struct.unpack('>f', decode)
+            return float(result) #Time since epoch
 
         def get_packet_num(self):
             decode = self._data[8:10]
@@ -174,7 +174,7 @@ class packetsim:
         self._timestamp = 0
         self._payload_size = 27
         self._header = {
-            "yoho": "yoho",
+            "yoho": "ohoy",
             "version": 0,
             "type": 1,
         }
@@ -225,7 +225,8 @@ class packetsim:
 
     #Gets the program time and returns it as a float.
     def create_and_get_timestamp(self):
-        self._timestamp = self.time.perf_counter()
+        self._timestamp = self.time.process_time() #In seconds
+        self._timestamp *= 1e+6 #Convert to microseconds
         return self._timestamp
 
     #Returns the size of the packet payload in bytes.
@@ -248,30 +249,33 @@ class packetsim:
         self._header["payload_size"] = self.get_payload_size()
         self._status["sensor_status"] = self.generate_status_word()
         self._cog_data["cog_data"] = self.generate_cog_data()
-        #Add the yoho value to the packet.
-        intermediate = self.string_packer(self._header.get('yoho'))
-        for byte in intermediate : raw_packet.append(byte)
-        #Add the version number to the packet.
-        intermediate = self.struct.pack('>B', self._header.get('version'))
-        for byte in intermediate : raw_packet.append(byte)
-        #Add the type number to the packet.
-        intermediate = self.struct.pack('>B', self._header.get('type'))
-        for byte in intermediate : raw_packet.append(byte)
-        #Add the packet number to the packet.
-        intermediate = self.struct.pack('>H', self._header.get('pkt_num'))
+        #Add the payload size to the packet.
+        intermediate = self.struct.pack('>I', self._header.get('payload_size'))
         for byte in intermediate : raw_packet.append(byte)
         #Add the time stamp to the packet.
         intermediate = self.struct.pack('>f', self._header.get('timestamp'))
         for byte in intermediate : raw_packet.append(byte)
-        #Add the payload size to the packet.
-        intermediate = self.struct.pack('>I', self._header.get('payload_size'))
+        #Add the packet number to the packet.
+        intermediate = self.struct.pack('>H', self._header.get('pkt_num'))
         for byte in intermediate : raw_packet.append(byte)
+        #Add the type number to the packet.
+        intermediate = self.struct.pack('>B', self._header.get('type'))
+        for byte in intermediate : raw_packet.append(byte)
+        #Add the version number to the packet.
+        intermediate = self.struct.pack('>B', self._header.get('version'))
+        for byte in intermediate : raw_packet.append(byte)
+        #Add the yoho value to the packet.
+        intermediate = self.string_packer(self._header.get('yoho'))
+        for byte in intermediate : raw_packet.append(byte)
+        ##################################################
         #Add the status word to the packet.
         intermediate = self._status.get('sensor_status')
         for byte in intermediate : raw_packet.append(byte)
+        ##################################################
         #Add the cog data to the packet.
         intermediate = self._cog_data.get('cog_data')
         for byte in intermediate : raw_packet.append(byte)
+        ##################################################
         #Return the generated packet.
         return raw_packet
 
