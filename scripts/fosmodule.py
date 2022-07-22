@@ -1,138 +1,175 @@
 #Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 #Module to contain classes for mpg-foss.
 
+class datahelper:
+    import re
+    def __init__(self):
+        self._header_indexes = {}
+        self._packets = {}
+        self._raw_data: bytearray
+
+    @property
+    def header_indexes(self):
+        return self._header_indexes
+
+    @property
+    def packets(self):
+        return self._packets
+
+    @property
+    def raw_data(self):
+        return self._raw_data
+
+    @raw_data.setter
+    def raw_data(self, data_in: bytearray):
+        if not isinstance(data_in, bytearray):
+            raise TypeError("Data input must be a bytearray.")
+        self._raw_data = data_in
+
+    #Finds the index of each packet in the raw data.
+    def sort(self):
+        #Get raw data object
+        data = self.raw_data
+        if self.raw_data is not None:
+            #Use regex to find all packets.
+            hit_num = 0
+            #For reference, yoho(ohoy here, because big endian) is b'\x6f\x68\x6f\x79'
+            for match in self.re.finditer(b'\x6f\x68\x6f\x79',data):
+                self._header_indexes[hit_num] = match.end() - 16 #Subtract 16 to reach beginning of packet.
+                hit_num += 1 #Post increment
+        return self._header_indexes
+
+    def parse(self):
+        #Get packets object
+        packets = self.packets
+        indexes = self.header_indexes
+        indexes = self.sort()
+        packets.clear()
+        keys = indexes.keys()
+        for key in keys:
+            packets[key] = self.raw_data[indexes[key]:indexes[key]+43]
+        return packets
+
 class gatorpacket:
+    import re 
+    def __init__(self):
+        self._raw_data: bytearray
+        self._header_instance: gatorpacket.header
+        self._status_instance: gatorpacket.status
+        self._data_instance: gatorpacket.data
+
+    def create_inner(self):
+        self._header_instance = gatorpacket.header(self)
+        self._status_instance = gatorpacket.status(self)
+        self._data_instance = gatorpacket.data(self)
+        return self._header_instance, self._status_instance, self._data_instance
+
+    @property
+    def header_instance(self):
+        return self._header_instance
+    
+    @property
+    def status_instance(self):
+        return self._status_instance
+
+    @property
+    def data_instance(self):
+        return self._data_instance
+
+    @property
+    def raw_data(self):
+        return self._raw_data
+
+    @raw_data.setter
+    def raw_data(self, data_in: bytearray):
+        if not isinstance(data_in, bytearray):
+            raise TypeError("Data input must be a bytearray.")
+        self._raw_data = data_in
+
     class header:
         import struct
-        def __init__(self):
+        def __init__(self, outer_instance):
+            self.outer_instance = outer_instance
             self._len = 16
-            self._data: bytearray
 
         @property
         def len(self):
             return self._len
 
-        @property
-        def data(self):
-            return self._data
-
-        @data.setter
-        def data(self, data: bytearray):
-            if not isinstance(data, bytearray):
-                raise TypeError("Data input must be a bytearray.")
-            self._data = data
-
         def get_payload_len(self):
-            decode = self._data[0:4]
+            decode = self.outer_instance.raw_data[0:4]
             result, = self.struct.unpack('>I', decode)
             return int(result) #Size in bytes?
 
         def get_timestamp(self):
-            decode = self._data[4:8]
+            decode = self.outer_instance.raw_data[4:8]
             result, = self.struct.unpack('>f', decode)
             return float(result) #Time since epoch
 
         def get_packet_num(self):
-            decode = self._data[8:10]
+            decode = self.outer_instance.raw_data[8:10]
             result, = self.struct.unpack('>H', decode)
             return int(result) #This packet number
 
         def get_gator_type(self):
-            decode = self._data[10]
+            decode = self.outer_instance.raw_data[10]
             decode = decode.to_bytes(1, byteorder='big')
             result, = self.struct.unpack('>B', decode)
             return int(result) #The type of gator connected
 
         def get_version(self):
-            decode = self._data[11]
+            decode = self.outer_instance.raw_data[11]
             decode = decode.to_bytes(1, byteorder='big')
             result, = self.struct.unpack('>B', decode)
             return int(result) #Gator firmware version
         
         def get_characters(self):
-            status = False
+            status = True
             characters = [12, 13, 14, 15]
             yoho = "ohoy"
             sync_str = ""
             for character in characters:
-                char = chr(self._data[character])
+                char = chr(self.outer_instance.raw_data[character])
                 sync_str += char
             if yoho == sync_str:
                 status = True
             return status
-  
 
-    class Status:
+    class status:
         import struct
-        def __init__(self):
+        def __init__(self, outer_instance):
+            self.outer_instance = outer_instance
             self._len = 3
-            self._data: bytearray
         
         @property
         def len(self):
             return self._len
 
-        @property
-        def data(self):
-            return self._data
-
-        @data.setter
-        def data(self, data: bytearray):
-            if not isinstance(data, bytearray):
-                raise TypeError("Data input must be a bytearray.")
-            self._data = data
-
         def get_num_found(self):
-            decode = self._data[17:20]
+            decode = self.outer_instance.raw_data[17:20]
             result, = self.struct.unpack('>c', decode)
             return int(result) 
 
-    class data: 
-        def __init__(self):
+    class data:
+        import re 
+        def __init__(self, outer_instance):
+            self.outer_instance = outer_instance
             self._len = 23
-            self._data: bytearray
             self._num_sensors = 8
+            self._cog_dictionary = {}
+
+        @property
+        def cog_dictionary(self):
+            return self._cog_dictionary
 
         @property
         def len(self):
             return self._len
 
-        @property
-        def data(self):
-            return self._data
-
-        @data.setter
-        def data(self, data: bytearray):
-            if not isinstance(data, bytearray):
-                raise TypeError("Data input must be a bytearray.")
-            self._data = data
-
         def access_bit(self, data, num):
             base = int(num // 8)
             shift = int(num % 8)
-            return (data[base] >> shift) & 0x1
-
-        def sort(buffer, somepacket, somedata, payloadDict):
-            ret_val = -1
-            i = -1 
-            is_sync = False
-            while (not is_sync and i < len(buffer)):
-                if buffer[i] == 'y' and buffer[i+1] == 'o' and buffer[i+2] == 'h' and buffer[i+3] == 'o':
-                    is_sync = True
-                    ret_val = i - 15
-                else:
-                    i = i + 4
-                    
-            if is_sync == False: 
-                print("yoho not found")
-            #print(i)
-            print(ret_val, "This is ret val")
-            payload_beginning = i - 27
-            payload_end = somepacket.get_payload_len() 
-            payloadDict.update({somepacket.get_packet_num(): somedata[payload_beginning:payload_end]})
-            timestamp_beginning = ret_val + 1
-            timestamp_end = somepacket.get_timestamp() + timestamp_beginning
-            return ret_val, payload_beginning, payload_end, timestamp_beginning, timestamp_end
+            return (data[base] >> shift) & 0x1       
 
         def sortcog(timestamp, payload_beginning, payload_end, lis, somedata, cog_data_dict):
             value2 = 0 
@@ -147,17 +184,17 @@ class gatorpacket:
                 value2 = value2 + 1
 
         def get_cog_data(self): 
-            decode = self._data[20:44]
+            decode = self.outer_instance.raw_data[20:44]
             as_string = bytes(decode)
             #print(as_string)
             bytes_as_bits = [self.access_bit(decode, i) for i in range (len(decode)*8)]
             #print(bytes_as_bits)
             #print("Length: ", len(bytes_as_bits))
-            sensors = []
+            sensors = {}
             for sensor in range(self._num_sensors):
                 x = 0
                 y = 19
-                sensors.append(bytes_as_bits[x:y])
+                sensors[f"Sensor_{sensor}"] = bytes_as_bits[x:y]
                 x += 19
                 y += 19
             return sensors
@@ -225,8 +262,8 @@ class packetsim:
 
     #Gets the program time and returns it as a float.
     def create_and_get_timestamp(self):
-        self._timestamp = self.time.process_time() #In seconds
-        self._timestamp *= 1e+6 #Convert to microseconds
+        self._timestamp = self.time.perf_counter() #In seconds
+        #self._timestamp *= 1e+6 #Convert to microseconds
         return self._timestamp
 
     #Returns the size of the packet payload in bytes.
