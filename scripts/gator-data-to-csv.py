@@ -3,6 +3,7 @@ Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
 #import pandas as pd
+import functools
 from lib2to3.pgen2.pgen import DFAState
 from halo import Halo
 from formatmodule import bcolors, bsymbols, pretty
@@ -36,6 +37,8 @@ def main():
     global spinner
     global collectDuration
     global num_packets
+    data_frames = []
+    outputPath = './data/out.csv'
     try:
         #Init console status indicator
         spinner.start()
@@ -88,11 +91,12 @@ def main():
                     print(f"{bsymbols.info} {bcolors.FAIL}Not printing cog data.{bcolors.ENDC}")
             if second_selection_made is False: 
                 spinner.stop()
-                
                 second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Read data to csv? [y/n]{bcolors.ENDC}")
                 if second_get_input == ("y" or "Y"):
                     second_selection_made = True
                     save_to_csv = True
+                    if os.path.exists(outputPath) and save_to_csv is True:
+                        os.remove(outputPath)
                     print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Reading data to csv...{bcolors.ENDC}")
                 elif second_get_input == ("n" or "N"):
                     second_selection_made = True
@@ -105,19 +109,21 @@ def main():
                 print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
             #TODO: Save to CSV here!
             #------------------------------------------------------------------------------------------------------------------------------------------#
-           
             if save_to_csv is True:
                 #print(cog_data)
-                for key in cog_data.keys():
-                    add = pd.Series([cog_data[key]])
-                    df = pd.concat([add], ignore_index=True)
-                outputPath = './data/out.csv'
-                df.to_csv(outputPath, mode = 'a', header = not os.path.exists(outputPath))
-                
-                
-                
-                
-
+                for key, value in cog_data.items():
+                    #print (key, value) #Debug
+                    #print(type(value)) #Debug
+                    bits = functools.reduce(lambda total, d: 10 * total + d, value, 0)
+                    columns = {'Packet Num':[pkt_num],'Timestamp':[pkt_timestamp], 'Sensor Index': [key], 'Sensor Bits': [bits]}
+                    frame = pd.DataFrame(columns)
+                    frame.set_index('Packet Num', inplace=True)
+                    data_frames.append(frame)
+            #--------------------------------------------------------------------------------------------------------------------#        
+        if save_to_csv is True:
+            for frame in data_frames:
+                #frame = pd.concat(frame, keys=["Packet number n"])
+                frame.to_csv(outputPath, mode = 'a', header = not os.path.exists(outputPath))
         #Stop console status indicator
         error_check()
         spinner.stop()
