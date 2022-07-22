@@ -3,9 +3,12 @@ Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
 #import pandas as pd
+from lib2to3.pgen2.pgen import DFAState
 from halo import Halo
 from formatmodule import bcolors, bsymbols, pretty
 from fosmodule import datahelper, gatorpacket, packetsim
+import pandas as pd
+import os
 
 #Initialize
 spinner = Halo(spinner='dots')
@@ -43,6 +46,8 @@ def main():
         #Set print option
         selection_made = False
         printout = False
+        second_selection_made = False 
+        save_to_csv = False
         #Generate given num of packets.
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
         simdata = simpacket.generate_packets(num_packets)
@@ -88,6 +93,29 @@ def main():
                 print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
             #TODO: Save to CSV here!
             #------------------------------------------------------------------------------------------------------------------------------------------#
+            if second_selection_made is False: 
+                spinner.stop()
+                second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Read data to csv? [y/n]{bcolors.ENDC}")
+                if second_get_input == ("y" or "Y"):
+                    second_selection_made = True
+                    save_to_csv = True
+                    print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Reading data to csv...{bcolors.ENDC}")
+                elif second_get_input == ("n" or "N"):
+                    second_selection_made = True
+                    save_to_csv = False
+                    print(f"{bsymbols.info} {bcolors.FAIL} Not reading to csv.{bcolors.ENDC}")
+            if save_to_csv is True:
+                #print(cog_data)
+                for key in cog_data.keys():
+                    add = pd.Series([cog_data[key]])
+                    df = pd.concat([add], ignore_index=True)
+                outputPath = './data/out.csv'
+                df.to_csv(outputPath, mode = 'a', header = not os.path.exists(outputPath))
+                
+                
+                
+                
+
         #Stop console status indicator
         error_check()
         spinner.stop()

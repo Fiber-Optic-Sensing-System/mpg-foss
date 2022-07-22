@@ -325,3 +325,9 @@ class packetsim:
             raw_packets.extend(self.generate_packet())
         #Return the generated packets.
         return raw_packets
+
+
+    def generate_wavelength(self, cog_data):
+        something, = self.struct.unpack('i', cog_data)
+        wavelengths = (1514 + something) / ((2 ** 18)*72)
+        return wavelengths
