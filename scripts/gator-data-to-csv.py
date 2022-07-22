@@ -4,8 +4,8 @@ Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
 #import pandas as pd
 from halo import Halo
-from formatmodule import bcolors, bsymbols
-from fosmodule import gatorpacket, packetsim
+from formatmodule import bcolors, bsymbols, pretty
+from fosmodule import datahelper, gatorpacket, packetsim
 
 #Initialize
 spinner = Halo(spinner='dots')
@@ -14,7 +14,7 @@ collectDuration = 0
 fileName = ""
 outputPath = ""
 #Number of packets to simulate
-num_packets = 25
+num_packets = 75
 
 def error_check():
     global errorStatus
@@ -28,37 +28,75 @@ def error_check():
         spinner.succeed("mpg-foss: Success!")
     spinner.start()
 
-try:
-    #Instantiate a packet simulator.
-    spinner.start()
-    simpacket = packetsim()
-    #Generate num packets.
-    print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
-    somedata = simpacket.generate_packets(num_packets)
-    if(somedata == None):
-        errorStatus = True
-    error_check()
-    #Use methods defined in fosmodule to extract data from raw bytes.
-    somepacket = gatorpacket.header()
-    somepacket.data = somedata
-    #print(somepacket.data.hex()) #Debug
-    print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Parsing packets...{bcolors.ENDC}")
-    yoho = somepacket.get_characters()
-    if(yoho == False):
-        errorStatus = True
-    error_check()
-    some_packet_payload_len = somepacket.get_payload_len()
-    some_packet_timestamp = somepacket.get_timestamp()
-    some_packet_num = somepacket.get_packet_num()
-    some_gator_type = somepacket.get_gator_type()
-    some_version = somepacket.get_version()
-    spinner.stop()
-    print(f" Packet num: {some_packet_num} -> recorded at {some_packet_timestamp}μs collection time.")
-    print(f" DEBUG: Payload len: {some_packet_payload_len} bytes | Gator type: {some_gator_type} | Gator version: {some_version}") #Debug
+def main():
+    global errorStatus
+    global spinner
+    global collectDuration
+    global num_packets
+    try:
+        #Init console status indicator
+        spinner.start()
+        ### Instantiate classes ###
+        datum = datahelper()
+        simpacket = packetsim()
+        #-------------------------#
+        #Set print option
+        selection_made = False
+        printout = False
+        #Generate given num of packets.
+        print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
+        simdata = simpacket.generate_packets(num_packets)
+        if(simdata == None):
+            errorStatus = True
+        error_check()
+        datum.raw_data = simdata
+        #----------------------------------------------------------------------------------------------#
+        ### Next, sort datum for packets ###
+        print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Parsing packets...{bcolors.ENDC}")
+        packets = datum.parse()
+        print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: {len(packets)} packets found...{bcolors.ENDC}", end="")
+        #----------------------------------------------------------------------------------------------#
+        ### Then get, values from each packet ###
+        for key in packets:
+            thispacket = gatorpacket()
+            thispacket.raw_data = packets[key]
+            #This tuple contains the inner class objects of the packet class.
+            pkt_header, pkt_status, pkt_cog = thispacket.create_inner()
+            #Pull out relevant values
+            pkt_num = pkt_header.get_packet_num()
+            pkt_timestamp = pkt_header.get_timestamp()
+            pkt_payload_len = pkt_header.get_payload_len()
+            gator_version = pkt_header.get_version()
+            gator_type = pkt_header.get_gator_type()
+            cog_data = pkt_cog.get_cog_data()
+            ### Get user decision on handling data ###
+            if selection_made is False:
+                spinner.stop()
+                get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Print cog data? [y/n]{bcolors.ENDC}")
+                if get_input == ("y" or "Y"):
+                    selection_made = True
+                    printout = True
+                    print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Printing out cog data...{bcolors.ENDC}")
+                elif get_input == ("n" or "N"):
+                    selection_made = True
+                    printout = False
+                    print(f"{bsymbols.info} {bcolors.FAIL}Not printing cog data.{bcolors.ENDC}")
+            if printout is True:
+                print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp}ns{bcolors.ENDC} collection time. COG data ↴") #μ
+                #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
+                pretty(cog_data, 1)
+                print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
+            #TODO: Save to CSV here!
+            #------------------------------------------------------------------------------------------------------------------------------------------#
+        #Stop console status indicator
+        error_check()
+        spinner.stop()
+        print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Done.{bcolors.ENDC}") #Done
+    except(KeyboardInterrupt, SystemExit):
+        spinner.text_color = 'red'
+        spinner.fail("mpg-foss: Process aborted.")
+    return errorStatus
 
-    #TODO: Get packet info from all packets in the buffer.
-
-    #print("-----------------------------------------------------")
-except(KeyboardInterrupt, SystemExit):
-    spinner.text_color = 'red'
-    spinner.fail("mpg-foss: Process aborted.")
+#Run the main function if this module is called directly.
+if __name__ == '__main__':
+   main()

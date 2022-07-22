@@ -23,6 +23,14 @@ def title():
     print(f"{bcolors.OKGREEN}/_/ /_/ /_/ .___/\__, /     /_/  \____/____/____/  {bcolors.ENDC}")
     print(f"{bcolors.OKGREEN}         /_/    /____/                             {bcolors.ENDC}")
 
+def pretty(d, indent=0):
+    for key, value in d.items():
+        print(' ' * indent + str(key), end='')
+        if isinstance(value, dict):
+            pretty(value, 0)
+        else:
+            print(f" ⇒ {bcolors.OKGREEN}{str(value)}{bcolors.ENDC}")
+
 class zen:
     zen = [
     "Beautiful is better than ugly.",
