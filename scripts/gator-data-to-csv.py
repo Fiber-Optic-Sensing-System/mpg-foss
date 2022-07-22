@@ -86,15 +86,9 @@ def main():
                     selection_made = True
                     printout = False
                     print(f"{bsymbols.info} {bcolors.FAIL}Not printing cog data.{bcolors.ENDC}")
-            if printout is True:
-                print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp}ns{bcolors.ENDC} collection time. COG data ↴") #μ
-                #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
-                pretty(cog_data, 1)
-                print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
-            #TODO: Save to CSV here!
-            #------------------------------------------------------------------------------------------------------------------------------------------#
             if second_selection_made is False: 
                 spinner.stop()
+                
                 second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Read data to csv? [y/n]{bcolors.ENDC}")
                 if second_get_input == ("y" or "Y"):
                     second_selection_made = True
@@ -104,6 +98,14 @@ def main():
                     second_selection_made = True
                     save_to_csv = False
                     print(f"{bsymbols.info} {bcolors.FAIL} Not reading to csv.{bcolors.ENDC}")
+            if printout is True:
+                print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp}ns{bcolors.ENDC} collection time. COG data ↴") #μ
+                #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
+                pretty(cog_data, 1)
+                print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
+            #TODO: Save to CSV here!
+            #------------------------------------------------------------------------------------------------------------------------------------------#
+           
             if save_to_csv is True:
                 #print(cog_data)
                 for key in cog_data.keys():
