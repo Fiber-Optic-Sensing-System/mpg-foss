@@ -2,14 +2,13 @@
 Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
-#import pandas as pd
-import functools
-from lib2to3.pgen2.pgen import DFAState
+
 from halo import Halo
-from formatmodule import bcolors, bsymbols, pretty
+from formatmodule import bcolors, bsymbols, pretty_sl
 from fosmodule import datahelper, gatorpacket, packetsim
 import pandas as pd
 import os
+import time
 
 #Initialize
 spinner = Halo(spinner='dots')
@@ -32,6 +31,12 @@ def error_check():
         spinner.succeed("mpg-foss: Success!")
     spinner.start()
 
+def detect_gator():
+    print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Searching for gator hardware...{bcolors.ENDC}")
+    time.sleep(0.65)
+    #Detect gator HW using pyusb
+    return False
+
 def main():
     global errorStatus
     global spinner
@@ -39,9 +44,32 @@ def main():
     global num_packets
     data_frames = []
     outputPath = './data/out.csv'
+    spinner.start()
+
+    try:
+        selection_made = False
+        gator_found = detect_gator()
+        if gator_found == False:
+            print(f"{bsymbols.info} {bcolors.FAIL}mpg-foss: No gator hardware found!{bcolors.ENDC}")
+            while selection_made is False:
+                spinner.stop()
+                get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Num packets to sim? [int]{bcolors.ENDC}")
+                if get_input.isnumeric:
+                    selection_made = True
+                    num_packets = int(get_input)
+                else:
+                    selection_made = False
+                    print(f"{bsymbols.info} {bcolors.FAIL}Enter an integer value!{bcolors.ENDC}")
+            spinner.start()
+        else:
+            #Collect real gator data into buffer.
+            pass
+    except(KeyboardInterrupt, SystemExit):
+        spinner.text_color = 'red'
+        spinner.fail("mpg-foss: Process aborted.")
+
     try:
         #Init console status indicator
-        spinner.start()
         ### Instantiate classes ###
         datum = datahelper()
         simpacket = packetsim()
@@ -103,21 +131,26 @@ def main():
                     save_to_csv = False
                     print(f"{bsymbols.info} {bcolors.FAIL} Not reading to csv.{bcolors.ENDC}")
             if printout is True:
-                print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp}ns{bcolors.ENDC} collection time. COG data ↴") #μ
+                print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp:.4f}μs{bcolors.ENDC} collection time. CoG data ↴")
                 #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
-                pretty(cog_data, 1)
-                print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
+                pretty_sl(cog_data, 1)
+                print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
             #TODO: Save to CSV here!
             #------------------------------------------------------------------------------------------------------------------------------------------#
             if save_to_csv is True:
-                #print(cog_data)
+                spinner.start()
+                cog = {}
+                err = {}
                 for key, value in cog_data.items():
-                    #print (key, value) #Debug
-                    #print(type(value)) #Debug
-                    #bits = functools.reduce(lambda total, d: 10 * total + d, value, 0)
-                    columns = {'Packet Num':[pkt_num],'Timestamp':[pkt_timestamp], 'Sensor Index': [key], 'Sensor Bits': [value]}
+                    for k, v in value.items():
+                        if k == "cog":
+                            cog[key] = v
+                        elif k == "err":
+                            err[key] = v    
+                for key, value in cog_data.items():
+                    columns = {'packet':[pkt_num],'timestamp':[pkt_timestamp], 'sensor': [key], 'cog': [cog[key]], 'err': [err[key]]}
                     frame = pd.DataFrame(columns)
-                    frame.set_index('Packet Num', inplace=True)
+                    frame.set_index('packet', inplace=True)
                     data_frames.append(frame)
             #--------------------------------------------------------------------------------------------------------------------#        
         if save_to_csv is True:
