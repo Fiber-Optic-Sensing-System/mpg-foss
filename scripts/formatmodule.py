@@ -23,6 +23,7 @@ def title():
     print(f"{bcolors.OKGREEN}/_/ /_/ /_/ .___/\__, /     /_/  \____/____/____/  {bcolors.ENDC}")
     print(f"{bcolors.OKGREEN}         /_/    /____/                             {bcolors.ENDC}")
 
+#Prints items nicely.
 def pretty(d, indent=0):
     for key, value in d.items():
         print(' ' * indent + str(key), end='')
@@ -30,6 +31,18 @@ def pretty(d, indent=0):
             pretty(value, 0)
         else:
             print(f" ⇒ {bcolors.OKGREEN}{str(value)}{bcolors.ENDC}")
+            
+#Prints items nicely in single line for nested lists.           
+def pretty_sl(d, indent=0):
+    for key, value in d.items():
+        print(' ' * indent + str(key) + ' ⇒ ', end='')
+        if isinstance(value, dict):
+            for k, v in value.items():
+                print(str(k) + ' ⇒ ', end='')
+                print(f"{bcolors.OKGREEN}{str(v)}{bcolors.ENDC} ", end='')
+            if next(reversed(value.keys())) == k:
+                print()
+        
 
 class zen:
     zen = [

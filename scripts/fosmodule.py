@@ -51,7 +51,6 @@ class datahelper:
         return packets
 
 class gatorpacket:
-    import re 
     def __init__(self):
         self._raw_data: bytearray
         self._header_instance: gatorpacket.header
@@ -151,8 +150,7 @@ class gatorpacket:
             return int(result) 
 
     class data:
-        from formatmodule import bcolors
-        import re 
+        from formatmodule import bcolors 
         def __init__(self, outer_instance):
             self.outer_instance = outer_instance
             self._len = 24
@@ -198,22 +196,26 @@ class gatorpacket:
             bit_string = ""
             for index, bit in enumerate(bits):
                 if index < 152:
-                    bit_string += str(bit)
                     #print(f"{index}:{self.bcolors.OKGREEN}{bit}{self.bcolors.ENDC}",end=" ") #Debug
-                    if index % 19 == 18:
+                    bit_string += str(bit)
+                    if len(bit_string) == 18:
                         sensor_index += 1
-                        sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"] = bit_string
+                        sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"] = {}
+                        sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"]['cog'] = bit_string
                         bit_string = ""
-
+                    if index % 19 == 18:
+                        bit_string = str(bit)
+                        sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"]['err'] = bit_string
+                        bit_string = ""       
             return sensors
 
 #This class is used for generating fake gator packets.
 class packetsim:
     import struct
-    import time
     import bitarray
     import random
     def __init__(self):
+        self._on_init = False
         self._num_sensors = 8
         self._packet_num = 0
         self._timestamp = 0
@@ -251,17 +253,33 @@ class packetsim:
 
     def generate_cog_data(self):
         cog_bits = self.bitarray.bitarray(184)
-        #151 is the end of the cog data
+        #Set all bits to 0
         cog_bits.setall(0)
-        #Set bits 1-150 to 1 or 0 randomly
-        for i in range(150):
-            cog_bits[i+1] = self.random.randint(0, 1)
-        #Set first bit and last bit to 1
-        cog_bits[0] = 1
+        #150 is the end of the cog data
+
+        #Set bits 0-151 to 1 or 0 randomly
+        for i in range(151):
+            cog_bits[i] = self.random.randint(0, 1)
+
+        #Set last 4 sensors to 0 to simulate none connected
+        cog_bits[76:151] = 0
+
+        #Set error status bits
+        cog_bits[18] = 0
+        cog_bits[37] = 0
+        cog_bits[56] = 0
+        cog_bits[75] = 0
+        cog_bits[94] = 1
+        cog_bits[113] = 1
+        cog_bits[132] = 1
         cog_bits[151] = 1
+        
         #Add data to padding bits
-        cog_bits[176:184] = 1
+        cog_bits[152:184] = 1
+
+        #Convert bitfield to bytes
         retval = cog_bits.tobytes()
+
         return retval
 
     #Adds one to the packet number and returns it.
@@ -271,8 +289,11 @@ class packetsim:
 
     #Gets the program time and returns it as a float.
     def create_and_get_timestamp(self):
-        self._timestamp = self.time.perf_counter() #In seconds
-        #self._timestamp *= 1e+6 #Convert to microseconds
+        if self._on_init == False:
+            self._on_init = True
+            self._timestamp = self.random.random()
+        else:
+            self._timestamp += 0.025
         return self._timestamp
 
     #Returns the size of the packet payload in bytes.
