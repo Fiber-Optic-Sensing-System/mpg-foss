@@ -151,10 +151,11 @@ class gatorpacket:
             return int(result) 
 
     class data:
+        from formatmodule import bcolors
         import re 
         def __init__(self, outer_instance):
             self.outer_instance = outer_instance
-            self._len = 23
+            self._len = 24
             self._num_sensors = 8
             self._cog_dictionary = {}
 
@@ -184,19 +185,26 @@ class gatorpacket:
                 value2 = value2 + 1
 
         def get_cog_data(self): 
-            decode = self.outer_instance.raw_data[20:44]
-            as_string = bytes(decode)
-            #print(as_string)
-            bytes_as_bits = [self.access_bit(decode, i) for i in range (len(decode)*8)]
-            #print(bytes_as_bits)
-            #print("Length: ", len(bytes_as_bits))
+            decode = self.outer_instance.raw_data[19:len(self.outer_instance.raw_data)]
+            pad_text = lambda i: "0" if i < 10 else ""
             sensors = {}
-            for sensor in range(self._num_sensors):
-                x = 0
-                y = 19
-                sensors[f"Sensor_{sensor}"] = bytes_as_bits[x:y]
-                x += 19
-                y += 19
+            bits = []
+
+            for byte in decode:
+                for bit in reversed(range(8)):
+                    bits.append(((byte >> bit) & 1))
+
+            sensor_index = 0
+            bit_string = ""
+            for index, bit in enumerate(bits):
+                if index < 152:
+                    bit_string += str(bit)
+                    #print(f"{index}:{self.bcolors.OKGREEN}{bit}{self.bcolors.ENDC}",end=" ") #Debug
+                    if index % 19 == 18:
+                        sensor_index += 1
+                        sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"] = bit_string
+                        bit_string = ""
+
             return sensors
 
 #This class is used for generating fake gator packets.
@@ -242,17 +250,18 @@ class packetsim:
         return retval
 
     def generate_cog_data(self):
-        #24 bytes of data
-        retval = bytearray()
-        for sensor in range(8):
-            cog_data = self.bitarray.bitarray(24)
-            cog_data.setall(0)
-            #Sensor data 0-17 random bits
-            for bit in range(17):
-                cog_data[bit] = self.random.randint(0, 1)
-            #Set sensor error to 0
-            cog_data[18] = 0
-            retval.extend(cog_data.tobytes())
+        cog_bits = self.bitarray.bitarray(184)
+        #151 is the end of the cog data
+        cog_bits.setall(0)
+        #Set bits 1-150 to 1 or 0 randomly
+        for i in range(150):
+            cog_bits[i+1] = self.random.randint(0, 1)
+        #Set first bit and last bit to 1
+        cog_bits[0] = 1
+        cog_bits[151] = 1
+        #Add data to padding bits
+        cog_bits[176:184] = 1
+        retval = cog_bits.tobytes()
         return retval
 
     #Adds one to the packet number and returns it.
@@ -311,7 +320,7 @@ class packetsim:
         ##################################################
         #Add the cog data to the packet.
         intermediate = self._cog_data.get('cog_data')
-        for byte in intermediate : raw_packet.append(byte)
+        raw_packet.extend(intermediate)
         ##################################################
         #Return the generated packet.
         return raw_packet

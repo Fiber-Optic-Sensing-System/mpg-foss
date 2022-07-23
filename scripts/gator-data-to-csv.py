@@ -18,7 +18,7 @@ collectDuration = 0
 fileName = ""
 outputPath = ""
 #Number of packets to simulate
-num_packets = 75
+num_packets = 25
 
 def error_check():
     global errorStatus
@@ -91,13 +91,13 @@ def main():
                     print(f"{bsymbols.info} {bcolors.FAIL}Not printing cog data.{bcolors.ENDC}")
             if second_selection_made is False: 
                 spinner.stop()
-                second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Read data to csv? [y/n]{bcolors.ENDC}")
+                second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Write data to csv? [y/n]{bcolors.ENDC}")
                 if second_get_input == ("y" or "Y"):
                     second_selection_made = True
                     save_to_csv = True
                     if os.path.exists(outputPath) and save_to_csv is True:
                         os.remove(outputPath)
-                    print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Reading data to csv...{bcolors.ENDC}")
+                    print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Writing data to csv...{bcolors.ENDC}")
                 elif second_get_input == ("n" or "N"):
                     second_selection_made = True
                     save_to_csv = False
@@ -114,8 +114,8 @@ def main():
                 for key, value in cog_data.items():
                     #print (key, value) #Debug
                     #print(type(value)) #Debug
-                    bits = functools.reduce(lambda total, d: 10 * total + d, value, 0)
-                    columns = {'Packet Num':[pkt_num],'Timestamp':[pkt_timestamp], 'Sensor Index': [key], 'Sensor Bits': [bits]}
+                    #bits = functools.reduce(lambda total, d: 10 * total + d, value, 0)
+                    columns = {'Packet Num':[pkt_num],'Timestamp':[pkt_timestamp], 'Sensor Index': [key], 'Sensor Bits': [value]}
                     frame = pd.DataFrame(columns)
                     frame.set_index('Packet Num', inplace=True)
                     data_frames.append(frame)
