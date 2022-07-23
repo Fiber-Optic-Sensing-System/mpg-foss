@@ -32,7 +32,7 @@ def error_check():
     spinner.start()
 
 def detect_gator():
-    print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Searching for gator hardware...{bcolors.ENDC}")
+    print(f"{bcolors.ENDC}{bsymbols.info} {bcolors.HEADER}mpg-foss: Searching for gator hardware...{bcolors.ENDC}")
     time.sleep(0.65)
     #Detect gator HW using pyusb
     return False
@@ -46,9 +46,10 @@ def main():
     global output_path
 
     #Initialize
-    data_frames = []
     spinner.start()
+    data_frames = []
 
+    #Try to detect hardware
     try:
         gator_found = detect_gator()
         if gator_found == False:
@@ -71,11 +72,13 @@ def main():
         spinner.text_color = 'red'
         spinner.fail("mpg-foss: Process aborted.")
 
+    #Move on to data collection
     try:
         #Init console status indicator
         ### Instantiate classes ###
         datum = datahelper()
         simpacket = packetsim()
+        pprint = prints()
         #-------------------------#
         #Set print option
         selection_print = False
@@ -137,7 +140,7 @@ def main():
                 print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp:.4f}μs{bcolors.ENDC} collection time. CoG data ↴")
                 #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
                 #Pretty printing of cog data
-                prints.pretty_sl(cog_data, 1)
+                pprint.pretty_sl(cog_data, 1)
                 print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
             #TODO: Save to CSV here!
             #------------------------------------------------------------------------------------------------------------------------------------------#

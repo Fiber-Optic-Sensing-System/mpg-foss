@@ -26,7 +26,7 @@ def main():
             filelist = [f for f in os.listdir(dir) if f.endswith(".csv") ]
             for f in filelist:
                 if f.find("example") == -1:
-                    print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Removing {f}...{bcolors.ENDC}")
+                    print(f"{bcolors.ENDC}{bsymbols.info} {bcolors.HEADER}mpg-foss: Removing {f}...{bcolors.ENDC}")
                     os.remove(os.path.join(dir, f))
                     spinner.text_color = 'green'
                     spinner.succeed("mpg-foss: Success!")

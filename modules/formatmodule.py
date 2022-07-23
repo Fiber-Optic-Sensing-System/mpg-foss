@@ -16,14 +16,6 @@ class bsymbols:
     info = '\U00002139'
     waste = '\U0001F5A9'
 
-def title():
-    print(f"{bcolors.OKGREEN}                                ____               {bcolors.ENDC}")
-    print(f"{bcolors.OKGREEN}   ____ ___  ____  ____ _      / __/___  __________{bcolors.ENDC}")
-    print(f"{bcolors.OKGREEN}  / __ `__ \/ __ \/ __ `/_____/ /_/ __ \/ ___/ ___/{bcolors.ENDC}")
-    print(f"{bcolors.OKGREEN} / / / / / / /_/ / /_/ /_____/ __/ /_/ (__  |__  ) {bcolors.ENDC}")
-    print(f"{bcolors.OKGREEN}/_/ /_/ /_/ .___/\__, /     /_/  \____/____/____/  {bcolors.ENDC}")
-    print(f"{bcolors.OKGREEN}         /_/    /____/                             {bcolors.ENDC}")
-
 class prints:
 
     #Prints items nicely.
@@ -45,6 +37,14 @@ class prints:
                     print(f"{bcolors.OKGREEN}{str(v)}{bcolors.ENDC} ", end='')
                 if next(reversed(value.keys())) == k:
                     print()
+
+    def title(self):
+        print(f"{bcolors.OKGREEN}                                ____               {bcolors.ENDC}")
+        print(f"{bcolors.OKGREEN}   ____ ___  ____  ____ _      / __/___  __________{bcolors.ENDC}")
+        print(f"{bcolors.OKGREEN}  / __ `__ \/ __ \/ __ `/_____/ /_/ __ \/ ___/ ___/{bcolors.ENDC}")
+        print(f"{bcolors.OKGREEN} / / / / / / /_/ / /_/ /_____/ __/ /_/ (__  |__  ) {bcolors.ENDC}")
+        print(f"{bcolors.OKGREEN}/_/ /_/ /_/ .___/\__, /     /_/  \____/____/____/  {bcolors.ENDC}")
+        print(f"{bcolors.OKGREEN}         /_/    /____/                             {bcolors.ENDC}")
 
 class files:
     import os

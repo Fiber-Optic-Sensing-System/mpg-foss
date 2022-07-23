@@ -2,7 +2,7 @@
 #Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
 import argparse
 import subprocess
-from modules.formatmodule import bcolors, bsymbols, title
+from modules.formatmodule import bcolors, bsymbols, prints
 
 def handle_args():
     parser = argparse.ArgumentParser(description='Run foss.py help for more information. Run foss.py deps to install dependencies.')
@@ -44,7 +44,8 @@ def switch(args):
             return
 
 #Run
+p = prints()
 args = handle_args()
-title()
+p.title()
 switch(args)
 
