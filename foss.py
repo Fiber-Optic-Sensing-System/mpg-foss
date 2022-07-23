@@ -12,11 +12,11 @@ def handle_args():
 
 def switch(args):
     match args.argument:
-        case "deps":
+        case "deps" | "dependencies" | "update":
             print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting dependency check tool...{bcolors.ENDC}")
             subprocess.call("python ./modules/dependency-helper.py", shell=True)
             return
-        case "data":
+        case "data" | "d" | "collect":
             print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting gator-data collection tool...{bcolors.ENDC}")
             subprocess.call("python ./modules/gator-data-to-csv.py", shell=True)
             return
@@ -24,11 +24,11 @@ def switch(args):
             print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting gator-data simulator...{bcolors.ENDC}")
             subprocess.call("python ./modules/gator-data-simulator.py", shell=True)
             return
-        case "clean":
+        case "clean" | "cleanup" | "remove":
             print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Clean output directory...{bcolors.ENDC}")
             subprocess.call("python ./modules/cleanup.py", shell=True)
             return
-        case "wisdom":
+        case "wisdom" | "zen":
             print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Providing you with design ethic...{bcolors.ENDC}")
             subprocess.call("python ./modules/design-wisdom.py", shell=True)
             return
