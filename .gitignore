@@ -1,4 +1,7 @@
+#Python caching
 __pycache__
+
+#Vscode specific
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -6,11 +9,12 @@ __pycache__
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
-# Local History for Visual Studio Code
+#Local History for Visual Studio Code
 .history/
 
-# Built Visual Studio Code Extensions
+#Built Visual Studio Code Extensions
 *.vsix
 
-# CSV Files from tests
+#CSV Files from tests
 *.csv
+!example.csv

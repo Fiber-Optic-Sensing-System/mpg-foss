@@ -14,6 +14,7 @@ class bcolors:
 
 class bsymbols:
     info = '\U00002139'
+    waste = '\U0001F5A9'
 
 def title():
     print(f"{bcolors.OKGREEN}                                ____               {bcolors.ENDC}")
@@ -23,25 +24,45 @@ def title():
     print(f"{bcolors.OKGREEN}/_/ /_/ /_/ .___/\__, /     /_/  \____/____/____/  {bcolors.ENDC}")
     print(f"{bcolors.OKGREEN}         /_/    /____/                             {bcolors.ENDC}")
 
-#Prints items nicely.
-def pretty(d, indent=0):
-    for key, value in d.items():
-        print(' ' * indent + str(key), end='')
-        if isinstance(value, dict):
-            pretty(value, 0)
-        else:
-            print(f" ⇒ {bcolors.OKGREEN}{str(value)}{bcolors.ENDC}")
-            
-#Prints items nicely in single line for nested lists.           
-def pretty_sl(d, indent=0):
-    for key, value in d.items():
-        print(' ' * indent + str(key) + ' ⇒ ', end='')
-        if isinstance(value, dict):
-            for k, v in value.items():
-                print(str(k) + ' ⇒ ', end='')
-                print(f"{bcolors.OKGREEN}{str(v)}{bcolors.ENDC} ", end='')
-            if next(reversed(value.keys())) == k:
-                print()
+class prints:
+
+    #Prints items nicely.
+    def pretty(self, d, indent=0):
+        for key, value in d.items():
+            print(' ' * indent + str(key), end='')
+            if isinstance(value, dict):
+                self.pretty(value, 0)
+            else:
+                print(f" ⇒ {bcolors.OKGREEN}{str(value)}{bcolors.ENDC}")
+                
+    #Prints items nicely in single line for nested lists.           
+    def pretty_sl(self, d, indent=0):
+        for key, value in d.items():
+            print(' ' * indent + str(key) + ' ⇒ ', end='')
+            if isinstance(value, dict):
+                for k, v in value.items():
+                    print(str(k) + ' ⇒ ', end='')
+                    print(f"{bcolors.OKGREEN}{str(v)}{bcolors.ENDC} ", end='')
+                if next(reversed(value.keys())) == k:
+                    print()
+
+class files:
+    import os
+
+    #Finds the next free path in an sequentially named list of files.
+    def next_path(self, path_pattern):
+        #e.g. path_pattern = 'file-%s.txt':
+        i = 1
+        #First do an exponential search
+        while self.os.path.exists(path_pattern % i):
+            i = i * 2
+
+        #Result lies somewhere in the interval (i/2..i]
+        a, b = (i // 2, i)
+        while a + 1 < b:
+            c = (a + b) // 2 # interval midpoint
+            a, b = (c, b) if self.os.path.exists(path_pattern % c) else (a, c)
+        return path_pattern % b
         
 
 class zen:

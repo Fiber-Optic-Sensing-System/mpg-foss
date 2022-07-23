@@ -1,10 +1,10 @@
 """
-Written by Caleb C. in 2022 for Carthage Space Sciences | WSGC | NASA
+Written by Caleb C. & Andrew Valentini in 2022 for Carthage Space Sciences | WSGC | NASA
 Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 """
 
 from halo import Halo
-from formatmodule import bcolors, bsymbols, pretty_sl
+from formatmodule import bcolors, bsymbols, prints, files
 from fosmodule import datahelper, gatorpacket, packetsim
 import pandas as pd
 import os
@@ -13,11 +13,11 @@ import time
 #Initialize
 spinner = Halo(spinner='dots')
 errorStatus = False
+date = time.strftime("%Y-%m-%d")
+f = files()
+output_path = f.next_path(f"./data/out/{date}_run-%s.csv")
+num_packets = 1
 collectDuration = 0
-fileName = ""
-outputPath = ""
-#Number of packets to simulate
-num_packets = 25
 
 def error_check():
     global errorStatus
@@ -38,27 +38,30 @@ def detect_gator():
     return False
 
 def main():
+    #Globals
     global errorStatus
     global spinner
     global collectDuration
     global num_packets
+    global output_path
+
+    #Initialize
     data_frames = []
-    outputPath = './data/out.csv'
     spinner.start()
 
     try:
-        selection_made = False
         gator_found = detect_gator()
         if gator_found == False:
             print(f"{bsymbols.info} {bcolors.FAIL}mpg-foss: No gator hardware found!{bcolors.ENDC}")
-            while selection_made is False:
+            selection_pkts = False
+            while selection_pkts == False:
                 spinner.stop()
                 get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Num packets to sim? [int]{bcolors.ENDC}")
-                if get_input.isnumeric:
-                    selection_made = True
+                get_input = get_input.strip()
+                if get_input.isnumeric() == True:
                     num_packets = int(get_input)
+                    selection_pkts = True
                 else:
-                    selection_made = False
                     print(f"{bsymbols.info} {bcolors.FAIL}Enter an integer value!{bcolors.ENDC}")
             spinner.start()
         else:
@@ -75,9 +78,9 @@ def main():
         simpacket = packetsim()
         #-------------------------#
         #Set print option
-        selection_made = False
+        selection_print = False
         printout = False
-        second_selection_made = False 
+        selection_csv = False 
         save_to_csv = False
         #Generate given num of packets.
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
@@ -106,35 +109,36 @@ def main():
             gator_type = pkt_header.get_gator_type()
             cog_data = pkt_cog.get_cog_data()
             ### Get user decision on handling data ###
-            if selection_made is False:
+            if selection_print is False:
                 spinner.stop()
                 get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Print cog data? [y/n]{bcolors.ENDC}")
                 if get_input == ("y" or "Y"):
-                    selection_made = True
+                    selection_print = True
                     printout = True
                     print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Printing out cog data...{bcolors.ENDC}")
                 elif get_input == ("n" or "N"):
-                    selection_made = True
+                    selection_print = True
                     printout = False
                     print(f"{bsymbols.info} {bcolors.FAIL}Not printing cog data.{bcolors.ENDC}")
-            if second_selection_made is False: 
+            if selection_csv is False: 
                 spinner.stop()
                 second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Write data to csv? [y/n]{bcolors.ENDC}")
                 if second_get_input == ("y" or "Y"):
-                    second_selection_made = True
+                    selection_csv = True
                     save_to_csv = True
-                    if os.path.exists(outputPath) and save_to_csv is True:
-                        os.remove(outputPath)
+                    if os.path.exists(output_path) and save_to_csv is True:
+                        os.remove(output_path)
                     print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Writing data to csv...{bcolors.ENDC}")
                 elif second_get_input == ("n" or "N"):
-                    second_selection_made = True
+                    selection_csv = True
                     save_to_csv = False
                     print(f"{bsymbols.info} {bcolors.FAIL} Not reading to csv.{bcolors.ENDC}")
             if printout is True:
                 print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp:.4f}μs{bcolors.ENDC} collection time. CoG data ↴")
                 #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
-                pretty_sl(cog_data, 1)
-                print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
+                #Pretty printing of cog data
+                prints.pretty_sl(cog_data, 1)
+                print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
             #TODO: Save to CSV here!
             #------------------------------------------------------------------------------------------------------------------------------------------#
             if save_to_csv is True:
@@ -156,7 +160,7 @@ def main():
         if save_to_csv is True:
             for frame in data_frames:
                 #frame = pd.concat(frame, keys=["Packet number n"])
-                frame.to_csv(outputPath, mode = 'a', header = not os.path.exists(outputPath))
+                frame.to_csv(output_path, mode = 'a', header = not os.path.exists(output_path))
         #Stop console status indicator
         error_check()
         spinner.stop()
