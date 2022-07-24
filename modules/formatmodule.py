@@ -62,7 +62,7 @@ class files:
         while a + 1 < b:
             c = (a + b) // 2 # interval midpoint
             a, b = (c, b) if self.os.path.exists(path_pattern % c) else (a, c)
-        return path_pattern % b    
+        return path_pattern % b
 
 class zen:
     zen = [
