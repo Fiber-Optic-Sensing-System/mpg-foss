@@ -13,29 +13,29 @@ def handle_args():
 def switch(args):
     match args.argument:
         case "deps" | "dependencies" | "update":
-            print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting dependency check tool...{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting dependency check tool...{bcolors.ENDC}")
             subprocess.call("python ./modules/dependency-helper.py", shell=True)
             return
         case "data" | "d" | "collect":
-            print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting gator-data collection tool...{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting gator-data collection tool...{bcolors.ENDC}")
             subprocess.call("python ./modules/gator-data-to-csv.py", shell=True)
             return
         case "sim":
-            print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting gator-data simulator...{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Starting gator-data simulator...{bcolors.ENDC}")
             subprocess.call("python ./modules/gator-data-simulator.py", shell=True)
             return
         case "clean" | "cleanup" | "remove":
-            print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Clean output directory...{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Clean output directory...{bcolors.ENDC}")
             subprocess.call("python ./modules/cleanup.py", shell=True)
             return
         case "wisdom" | "zen":
-            print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Providing you with design ethic...{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Providing you with design ethic...{bcolors.ENDC}")
             subprocess.call("python ./modules/design-wisdom.py", shell=True)
             return
         case _:
             #launch help
-            print(f"{bsymbols.info} {bcolors.FAIL}{bcolors.BOLD}mpg-foss: Unknown argument...{bcolors.ENDC}")
-            print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Available commands:{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info} {bcolors.FAIL}{bcolors.BOLD}mpg-foss: Unknown argument...{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Available commands:{bcolors.ENDC}")
             print(f"    deps{bcolors.ENDC}")
             print(f"    data{bcolors.ENDC}")
             print(f"    clean{bcolors.ENDC}")
