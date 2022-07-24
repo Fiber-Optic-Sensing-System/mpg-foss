@@ -83,7 +83,7 @@ def main():
         #Set print option
         selection_print = False
         printout = False
-        selection_csv = False 
+        selection_csv = False
         save_to_csv = False
         #Generate given num of packets.
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
@@ -153,7 +153,7 @@ def main():
                         if k == "cog":
                             cog[key] = v
                         elif k == "err":
-                            err[key] = v    
+                            err[key] = v
                 for key, value in cog_data.items():
                     columns = {'packet':[pkt_num],'timestamp':[pkt_timestamp], 'sensor': [key], 'cog': [cog[key]], 'err': [err[key]]}
                     frame = pd.DataFrame(columns)
