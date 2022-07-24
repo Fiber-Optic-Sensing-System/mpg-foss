@@ -123,7 +123,7 @@ def main():
                     selection_print = True
                     printout = False
                     print(f"{bsymbols.info} {bcolors.FAIL}Not printing cog data.{bcolors.ENDC}")
-            if selection_csv is False: 
+            if selection_csv is False:
                 spinner.stop()
                 second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Write data to csv? [y/n]{bcolors.ENDC}")
                 if second_get_input == ("y" or "Y"):
@@ -159,7 +159,7 @@ def main():
                     frame = pd.DataFrame(columns)
                     frame.set_index('packet', inplace=True)
                     data_frames.append(frame)
-            #--------------------------------------------------------------------------------------------------------------------#        
+            #--------------------------------------------------------------------------------------------------------------------#
         if save_to_csv is True:
             for frame in data_frames:
                 #frame = pd.concat(frame, keys=["Packet number n"])
