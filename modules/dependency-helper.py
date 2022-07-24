@@ -5,7 +5,7 @@ import subprocess
 import sys
 from formatmodule import bcolors, bsymbols
 
-modules_base = ['wheel', 'halo'] 
+modules_base = ['wheel', 'halo']
 modules_dependencies = ['struct', 'usb.core', 'pandas', 'matplotlib', 'statsmodels', 'ttkbootstrap', 'scipy', 'bitarray']
 fail = False
 
@@ -57,7 +57,7 @@ def test():
             fail = True
             print(f"{bcolors.FAIL}mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
     for module in modules_base:
-        try: 
+        try:
             __import__ (module)
         except ImportError:
             fail = True
