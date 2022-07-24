@@ -29,7 +29,6 @@ def basic():
                 subprocess.check_call([sys.executable, "-m", "pip", "install", module])
             except subprocess.SubprocessError:
                 print(f"{bcolors.FAIL}mpg-foss: Could not acquire module named {module}. {bcolors.ENDC}")
-    pass
 
 def advanced():
     global modules_dependencies
@@ -44,7 +43,6 @@ def advanced():
                 subprocess.check_call([sys.executable, "-m", "pip", "install", module])
             except subprocess.SubprocessError:
                 print(f"{bcolors.FAIL}mpg-foss: Could not acquire module named {module}.{bcolors.ENDC}")
-    pass
 
 def test():
     global modules_dependencies
@@ -64,7 +62,6 @@ def test():
         except ImportError:
             fail = True
             print(f"{bcolors.FAIL}mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
-    pass
 
 try:
     basic()
