@@ -44,8 +44,6 @@ def self_update():
         g = git.cmd.Git(project_url)
         msg = g.pull()
         repo = git.Repo(search_parent_directories = True)
-        sha = repo.head.object.hexsha
-        #commit_chksum = repo.git.rev_parse(sha, short = 7)
         tag = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
         print(f"{bsymbols.info}{bcolors.HEADER} git: Last commit {tag} & {msg}{bcolors.ENDC}")
     except git.exc.GitCommandError:
