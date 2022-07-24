@@ -270,7 +270,7 @@ class packetsim:
 
     #Gets the program time and returns it as a float.
     def create_and_get_timestamp(self):
-        if self._on_init == False:
+        if self._on_init is False:
             self._on_init = True
             self._timestamp = self.random.random()
         else:
@@ -286,7 +286,7 @@ class packetsim:
         string = bytes(string, 'utf-8')
         retval = self.struct.pack('>{}s'.format(len(string)), string)
         return retval
-    
+
     #Generates a single packet.
     def generate_packet(self):
         #Create byte array of raw simulated data.
