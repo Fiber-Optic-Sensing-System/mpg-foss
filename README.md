@@ -5,7 +5,9 @@
  - `data` starts gator hardware data retrieval.
  - `sim` starts usb gator data output simulation.
 
- ![](https://github.com/Fiber-Optic-Sensing-System/mpg-foss/blob/3ae0fde76840068c445936d9e18543469b4d0705/data/images/example_usage.png?raw=true)
+<p align="center">
+	<img height="240" src="https://github.com/Fiber-Optic-Sensing-System/mpg-foss/blob/3ae0fde76840068c445936d9e18543469b4d0705/data/images/example_usage.png?raw=true"/>
+</p>
 
  - Use the `foss.py` script in the root directory to execute commands.
  - `foss.py help` to list commands.
