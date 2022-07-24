@@ -29,7 +29,7 @@
 
 - Start by **[downloading](https://github.com/Fiber-Optic-Sensing-System/mpg-foss/archive/refs/heads/main.zip)** or `git clone`ing the source code.
   - *Extract the repo folder if you downloaded the main branch directly.*
- 
+
 - Use the `foss.py` script in the root directory to execute commands.
  	- `deps` gets required modules.
  	- `data` starts gator hardware data retrieval.
