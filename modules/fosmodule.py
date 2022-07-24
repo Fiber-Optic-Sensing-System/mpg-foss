@@ -150,7 +150,6 @@ class gatorpacket:
             return int(result)
 
     class data:
-        from formatmodule import bcolors 
         def __init__(self, outer_instance):
             self.outer_instance = outer_instance
             self._len = 24
@@ -165,12 +164,7 @@ class gatorpacket:
         def len(self):
             return self._len
 
-        def access_bit(self, data, num):
-            base = int(num // 8)
-            shift = int(num % 8)
-            return (data[base] >> shift) & 0x1 
-
-        def get_cog_data(self): 
+        def get_cog_data(self):
             decode = self.outer_instance.raw_data[19:len(self.outer_instance.raw_data)]
             pad_text = lambda i: "0" if i < 10 else ""
             sensors = {}
@@ -184,7 +178,6 @@ class gatorpacket:
             bit_string = ""
             for index, bit in enumerate(bits):
                 if index < 152:
-                    #print(f"{index}:{self.bcolors.OKGREEN}{bit}{self.bcolors.ENDC}",end=" ") #Debug
                     bit_string += str(bit)
                     if len(bit_string) == 18:
                         sensor_index += 1
