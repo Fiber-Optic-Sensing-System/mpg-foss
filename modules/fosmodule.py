@@ -254,7 +254,7 @@ class packetsim:
         cog_bits[113] = 1
         cog_bits[132] = 1
         cog_bits[151] = 1
-        
+
         #Add data to padding bits
         cog_bits[152:184] = 1
 
