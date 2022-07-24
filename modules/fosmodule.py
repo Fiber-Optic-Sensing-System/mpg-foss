@@ -139,7 +139,7 @@ class gatorpacket:
         def __init__(self, outer_instance):
             self.outer_instance = outer_instance
             self._len = 3
-        
+
         @property
         def len(self):
             return self._len
