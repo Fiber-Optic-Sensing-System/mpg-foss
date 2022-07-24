@@ -22,7 +22,7 @@ def basic():
             else:
                 __import__ (module)
         except ImportError:
-            print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: {module} not found...{bcolors.ENDC}")
+            print(f"{bsymbols.info} mpg-foss: {module} not found...{bcolors.ENDC}")
             print(f"{bsymbols.info}{bcolors.HEADER} mpg-foss: Installing {module}...{bcolors.ENDC}")
             try:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", module])
@@ -40,14 +40,20 @@ def check_pip():
 def self_update():
     try:
         import git
-        print(f"{bsymbols.info}{bcolors.HEADER} mpg-foss: Performing self update...{bcolors.ENDC}")
+        spinner.text_color ='magenta'
+        spinner.info("mpg-foss: Performing self update...")
+        spinner.start()
         g = git.cmd.Git(project_url)
         msg = g.pull()
         tag = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
-        print(f"{bsymbols.info}{bcolors.HEADER} git: Latest commit to this branch was {tag}{bcolors.ENDC}")
-        print(f"{bsymbols.info}{bcolors.HEADER} {msg}{bcolors.ENDC}")
+        spinner.text_color ='magenta'
+        spinner.info(f"git: Latest commit to this branch was {tag}")
+        spinner.start()
+        spinner.info(f"{msg}")
+        spinner.start()
     except (git.exc.GitCommandError, subprocess.SubprocessError):
-        print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: Could not self update with git.{bcolors.ENDC}")
+        spinner.text_color ='red'
+        spinner.fail("mpg-foss: Could not update from git.")
 
 def advanced():
     global modules_dependencies
@@ -59,12 +65,17 @@ def advanced():
             else:
                 __import__ (module)
         except ImportError:
-            print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: {module} not found...{bcolors.ENDC}")
-            print(f"{bsymbols.info}{bcolors.HEADER} mpg-foss: Installing {module}...{bcolors.ENDC}")
+            spinner.text_color ='grey'
+            spinner.fail(f"mpg-foss: {module} not found...")
+            spinner.start()
+            spinner.text_color ='magenta'
+            spinner.info(f"mpg-foss: Installing {module}...")
+            spinner.start()
             try:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", module])
             except subprocess.SubprocessError:
-                print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: Could not acquire module named {module}.{bcolors.ENDC}")
+                spinner.text_color ='red'
+                spinner.fail(f"mpg-foss: Could not acquire module named {module}.")
 
 def test(mode):
     global modules_dependencies
@@ -82,7 +93,9 @@ def test(mode):
                 fail = True
                 print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
     elif mode == 'advanced':
-        print(f"{bsymbols.info}{bcolors.HEADER} mpg-foss: Verifying...{bcolors.ENDC}")
+        spinner.text_color ='magenta'
+        spinner.info("mpg-foss: Verifying...")
+        spinner.start()
         for module in modules_dependencies:
             if modules_alt_name.get(module) is not None:
                 module = modules_alt_name.get(module)
@@ -90,13 +103,14 @@ def test(mode):
                 __import__ (module)
             except ImportError:
                 fail = True
-                print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
+                spinner.text_color ='red'
+                spinner.fail(f"mpg-foss: {module} was not imported. Try manually installing it.")
     check_fail()
 
 def init_spinner():
     global spinner
     from halo import Halo
-    spinner = Halo(spinner='dots')
+    spinner = Halo(spinner='dots', animation='bounce')
     spinner.start()
 
 def check_fail():
@@ -105,7 +119,7 @@ def check_fail():
     if fail is not True and spinner is not None:
         spinner.text_color = 'green'
         spinner.succeed(" mpg-foss: Dependencies present & checked.")
-        print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Done.{bcolors.ENDC}")
+        spinner.info("mpg-foss: Done.")
     elif fail is True:
         if spinner is not None:
             spinner.text_color = 'red'

@@ -13,7 +13,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 class bsymbols:
-    info = '\U00002139'
+    info = '\U000000A1'
     waste = '\U0001F5A9'
 
 class prints:
