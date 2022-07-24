@@ -1,16 +1,6 @@
 #Written by Caleb C. & Andrew V. in 2022 for Carthage Space Sciences | WSGC | NASA
-#Simulates gator data for the purposes of testing.
+#Simulates gator data at the hardware (USB) level for the purposes of testing.
 from formatmodule import bcolors, bsymbols
-import struct
-import pandas as pd 
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import statsmodels.api as sm 
-from scipy.fft import fft
-
-#TODO: Check if noise is being generated correctly.
-#TODO: Covert noise to data in gator format and transmit.
 
 from halo import Halo
 fail = False
@@ -27,6 +17,3 @@ else:
     spinner.text_color = 'red'
     spinner.fail("mpg-foss: There was an exception!")
     print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Done.{bcolors.ENDC}")
-
-
-

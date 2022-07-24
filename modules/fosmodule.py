@@ -147,10 +147,9 @@ class gatorpacket:
         def get_num_found(self):
             decode = self.outer_instance.raw_data[17:20]
             result, = self.struct.unpack('>c', decode)
-            return int(result) 
+            return int(result)
 
     class data:
-        from formatmodule import bcolors 
         def __init__(self, outer_instance):
             self.outer_instance = outer_instance
             self._len = 24
@@ -165,24 +164,7 @@ class gatorpacket:
         def len(self):
             return self._len
 
-        def access_bit(self, data, num):
-            base = int(num // 8)
-            shift = int(num % 8)
-            return (data[base] >> shift) & 0x1       
-
-        def sortcog(timestamp, payload_beginning, payload_end, lis, somedata, cog_data_dict):
-            value2 = 0 
-            if value2 < len(lis):
-                cog_data_beginning = payload_beginning + 3
-                cog_data_end = payload_beginning + 27
-                if (cog_data_end == payload_end): 
-                    some_data_slice = somedata[cog_data_beginning:cog_data_end]
-                    cog_data_dict[timestamp] = some_data_slice
-                return cog_data_beginning, cog_data_end
-            else: 
-                value2 = value2 + 1
-
-        def get_cog_data(self): 
+        def get_cog_data(self):
             decode = self.outer_instance.raw_data[19:len(self.outer_instance.raw_data)]
             pad_text = lambda i: "0" if i < 10 else ""
             sensors = {}
@@ -196,7 +178,6 @@ class gatorpacket:
             bit_string = ""
             for index, bit in enumerate(bits):
                 if index < 152:
-                    #print(f"{index}:{self.bcolors.OKGREEN}{bit}{self.bcolors.ENDC}",end=" ") #Debug
                     bit_string += str(bit)
                     if len(bit_string) == 18:
                         sensor_index += 1
@@ -206,7 +187,7 @@ class gatorpacket:
                     if index % 19 == 18:
                         bit_string = str(bit)
                         sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"]['err'] = bit_string
-                        bit_string = ""       
+                        bit_string = ""
             return sensors
 
 #This class is used for generating fake gator packets.
@@ -334,15 +315,12 @@ class packetsim:
         #Add the yoho value to the packet.
         intermediate = self.string_packer(self._header.get('yoho'))
         for byte in intermediate : raw_packet.append(byte)
-        ##################################################
         #Add the status word to the packet.
         intermediate = self._status.get('sensor_status')
         for byte in intermediate : raw_packet.append(byte)
-        ##################################################
         #Add the cog data to the packet.
         intermediate = self._cog_data.get('cog_data')
         raw_packet.extend(intermediate)
-        ##################################################
         #Return the generated packet.
         return raw_packet
 
@@ -351,7 +329,7 @@ class packetsim:
         #Create byte array of raw simulated data.
         raw_packets = bytearray()
         #Generate the specified number of packets.
-        for i in range(num_packets):
+        for _ in range(num_packets):
             raw_packets.extend(self.generate_packet())
         #Return the generated packets.
         return raw_packets

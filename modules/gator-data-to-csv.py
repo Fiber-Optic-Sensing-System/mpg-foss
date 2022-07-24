@@ -83,7 +83,7 @@ def main():
         #Set print option
         selection_print = False
         printout = False
-        selection_csv = False 
+        selection_csv = False
         save_to_csv = False
         #Generate given num of packets.
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
@@ -107,9 +107,9 @@ def main():
             #Pull out relevant values
             pkt_num = pkt_header.get_packet_num()
             pkt_timestamp = pkt_header.get_timestamp()
-            pkt_payload_len = pkt_header.get_payload_len()
-            gator_version = pkt_header.get_version()
-            gator_type = pkt_header.get_gator_type()
+            #pkt_payload_len = pkt_header.get_payload_len()
+            #gator_version = pkt_header.get_version()
+            #gator_type = pkt_header.get_gator_type()
             cog_data = pkt_cog.get_cog_data()
             ### Get user decision on handling data ###
             if selection_print is False:
@@ -123,7 +123,7 @@ def main():
                     selection_print = True
                     printout = False
                     print(f"{bsymbols.info} {bcolors.FAIL}Not printing cog data.{bcolors.ENDC}")
-            if selection_csv is False: 
+            if selection_csv is False:
                 spinner.stop()
                 second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Write data to csv? [y/n]{bcolors.ENDC}")
                 if second_get_input == ("y" or "Y"):
@@ -153,13 +153,13 @@ def main():
                         if k == "cog":
                             cog[key] = v
                         elif k == "err":
-                            err[key] = v    
+                            err[key] = v
                 for key, value in cog_data.items():
                     columns = {'packet':[pkt_num],'timestamp':[pkt_timestamp], 'sensor': [key], 'cog': [cog[key]], 'err': [err[key]]}
                     frame = pd.DataFrame(columns)
                     frame.set_index('packet', inplace=True)
                     data_frames.append(frame)
-            #--------------------------------------------------------------------------------------------------------------------#        
+            #--------------------------------------------------------------------------------------------------------------------#
         if save_to_csv is True:
             for frame in data_frames:
                 #frame = pd.concat(frame, keys=["Packet number n"])

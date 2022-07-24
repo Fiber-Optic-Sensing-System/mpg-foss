@@ -7,7 +7,7 @@ from halo import Halo
 
 def main():
     spinner = Halo(spinner='dots')
-    dir = "./data/out/"
+    target_dir = "./data/out/"
 
     print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: This will remove data from previous runs...{bcolors.ENDC}")
 
@@ -23,16 +23,16 @@ def main():
     if erase_data == True:
         spinner.start()
         try:
-            filelist = [f for f in os.listdir(dir) if f.endswith(".csv") ]
+            filelist = [f for f in os.listdir(target_dir) if f.endswith(".csv") ]
             for f in filelist:
                 if f.find("example") == -1:
                     print(f"{bcolors.ENDC}{bsymbols.info} {bcolors.HEADER}mpg-foss: Removing {f}...{bcolors.ENDC}")
-                    os.remove(os.path.join(dir, f))
+                    os.remove(os.path.join(target_dir, f))
                     spinner.text_color = 'green'
                     spinner.succeed("mpg-foss: Success!")
             spinner.text_color = 'green'
             spinner.stop_and_persist(symbol='🗑️ '.encode('utf-8'), text=" mpg-foss: Done.")
-        except:
+        except OSError:
             spinner.text_color = 'red'
             spinner.fail["mpg-foss: Unable to delete files, are they open elsewhere?"]
     exit()
