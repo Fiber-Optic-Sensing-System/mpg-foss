@@ -110,7 +110,7 @@ def test(mode):
 def init_spinner():
     global spinner
     from halo import Halo
-    spinner = Halo(spinner='dots', animation='bounce')
+    spinner = Halo(spinner='dots', animation='bounce', color='green')
     spinner.start()
 
 def check_fail():
