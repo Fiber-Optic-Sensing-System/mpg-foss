@@ -43,7 +43,6 @@ def self_update():
         print(f"{bsymbols.info}{bcolors.HEADER} mpg-foss: Performing self update...{bcolors.ENDC}")
         g = git.cmd.Git(project_url)
         msg = g.pull()
-        repo = git.Repo(search_parent_directories = True)
         tag = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
         print(f"{bsymbols.info}{bcolors.HEADER} git: Last commit {tag} & {msg}{bcolors.ENDC}")
     except git.exc.GitCommandError:
