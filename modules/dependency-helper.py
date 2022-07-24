@@ -49,7 +49,7 @@ def test():
     global modules_base
     global fail
     print(f"{bcolors.HEADER}mpg-foss: Verifying...{bcolors.ENDC}")
-    
+
     for module in modules_dependencies:
         try:
             __import__ (module)
