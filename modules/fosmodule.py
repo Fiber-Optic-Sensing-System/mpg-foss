@@ -66,7 +66,7 @@ class gatorpacket:
     @property
     def header_instance(self):
         return self._header_instance
-    
+
     @property
     def status_instance(self):
         return self._status_instance

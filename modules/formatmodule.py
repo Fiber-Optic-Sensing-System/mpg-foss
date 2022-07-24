@@ -26,8 +26,8 @@ class prints:
                 self.pretty(value, 0)
             else:
                 print(f" ⇒ {bcolors.OKGREEN}{str(value)}{bcolors.ENDC}")
-                
-    #Prints items nicely in single line for nested lists.           
+
+    #Prints items nicely in single line for nested lists.
     def pretty_sl(self, d, indent=0):
         for key, value in d.items():
             print(' ' * indent + str(key) + ' ⇒ ', end='')
