@@ -17,6 +17,3 @@ else:
     spinner.text_color = 'red'
     spinner.fail("mpg-foss: There was an exception!")
     print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Done.{bcolors.ENDC}")
-
-
-
