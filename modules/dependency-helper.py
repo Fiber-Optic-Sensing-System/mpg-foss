@@ -13,7 +13,7 @@ spinner = None
 
 def basic():
     global modules_base
-    print(f"{bsymbols.info}{bcolors.HEADER} mpg-foss: Checking dependencies.{bcolors.ENDC}")
+    print(f"{bcolors.OKBLUE}{bsymbols.info}{bcolors.HEADER} mpg-foss: Checking dependencies.{bcolors.ENDC}")
     for module in modules_base:
         try:
             if modules_alt_name.get(module) is not None:
@@ -22,12 +22,12 @@ def basic():
             else:
                 __import__ (module)
         except ImportError:
-            print(f"{bsymbols.info} mpg-foss: {module} not found...{bcolors.ENDC}")
-            print(f"{bsymbols.info}{bcolors.HEADER} mpg-foss: Installing {module}...{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info}{bcolors.ENDC} mpg-foss: {module} not found...")
+            print(f"{bcolors.OKBLUE}{bsymbols.info}{bcolors.HEADER} mpg-foss: Installing {module}...{bcolors.ENDC}")
             try:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", module])
             except subprocess.SubprocessError:
-                print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: Could not acquire module named {module}. {bcolors.ENDC}")
+                print(f"{bcolors.OKBLUE}{bsymbols.info}{bcolors.FAIL} mpg-foss: Could not acquire module named {module}. {bcolors.ENDC}")
 
 def check_pip():
     try:
@@ -35,7 +35,7 @@ def check_pip():
         stdout=subprocess.DEVNULL,
         stderr=subprocess.STDOUT)
     except subprocess.SubprocessError:
-        print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: Could not update pip...{bcolors.ENDC}")
+        print(f"{bcolors.OKBLUE}{bsymbols.info}{bcolors.FAIL} mpg-foss: Could not update pip...{bcolors.ENDC}")
 
 def self_update():
     try:
@@ -83,7 +83,7 @@ def test(mode):
     global modules_alt_name
     global fail
     if mode == 'basic':
-        print(f"{bsymbols.info}{bcolors.HEADER} mpg-foss: Verifying...{bcolors.ENDC}")
+        print(f"{bcolors.OKBLUE}{bsymbols.info}{bcolors.HEADER} mpg-foss: Verifying...{bcolors.ENDC}")
         for module in modules_base:
             if modules_alt_name.get(module) is not None:
                 module = modules_alt_name.get(module)
@@ -91,7 +91,7 @@ def test(mode):
                 __import__ (module)
             except ImportError:
                 fail = True
-                print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
+                print(f"{bcolors.OKBLUE}{bsymbols.info}{bcolors.FAIL} mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
     elif mode == 'advanced':
         spinner.text_color ='magenta'
         spinner.info("mpg-foss: Verifying...")
@@ -125,7 +125,7 @@ def check_fail():
             spinner.text_color = 'red'
             spinner.fail(" mpg-foss: Some tests failed!")
         else:
-            print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: Some tests failed!{bcolors.ENDC}")
+            print(f"{bcolors.OKBLUE}{bsymbols.info}{bcolors.FAIL} mpg-foss: Some tests failed!{bcolors.ENDC}")
 
 def main():
     try:
