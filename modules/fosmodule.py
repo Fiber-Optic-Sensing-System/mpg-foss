@@ -121,7 +121,7 @@ class gatorpacket:
             decode = decode.to_bytes(1, byteorder='big')
             result, = self.struct.unpack('>B', decode)
             return int(result) #Gator firmware version
-        
+
         def get_characters(self):
             status = True
             characters = [12, 13, 14, 15]
