@@ -63,20 +63,26 @@ def test():
             fail = True
             print(f"{bcolors.FAIL}mpg-foss: {module} was not imported. Try manually installing it. {bcolors.ENDC}")
 
-try:
-    basic()
-    from halo import Halo
-    spinner = Halo(spinner='dots')
-    spinner.start()
-    advanced()
-    test()
-    if fail != True:
-        spinner.text_color = 'green'
-        spinner.succeed("mpg-foss: Dependencies present & checked.")
-        print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Done.{bcolors.ENDC}")
-    else:
-        spinner.text_color = 'red'
-        spinner.fail("mpg-foss: Some tests failed!")
-        print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Done.{bcolors.ENDC}")
-except (KeyboardInterrupt, SystemExit):
-    spinner.stop()
+def main():
+    try:
+        basic()
+        from halo import Halo
+        spinner = Halo(spinner='dots')
+        spinner.start()
+        advanced()
+        test()
+        if fail is not True:
+            spinner.text_color = 'green'
+            spinner.succeed("mpg-foss: Dependencies present & checked.")
+            print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Done.{bcolors.ENDC}")
+        else:
+            spinner.text_color = 'red'
+            spinner.fail("mpg-foss: Some tests failed!")
+            print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Done.{bcolors.ENDC}")
+    except (KeyboardInterrupt, SystemExit):
+        spinner.stop()
+    exit()
+
+#Run the main function if this module is called directly.
+if __name__ == '__main__':
+   main()
