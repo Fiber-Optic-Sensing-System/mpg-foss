@@ -107,9 +107,9 @@ def main():
             #Pull out relevant values
             pkt_num = pkt_header.get_packet_num()
             pkt_timestamp = pkt_header.get_timestamp()
-            pkt_payload_len = pkt_header.get_payload_len()
-            gator_version = pkt_header.get_version()
-            gator_type = pkt_header.get_gator_type()
+            #pkt_payload_len = pkt_header.get_payload_len()
+            #gator_version = pkt_header.get_version()
+            #gator_type = pkt_header.get_gator_type()
             cog_data = pkt_cog.get_cog_data()
             ### Get user decision on handling data ###
             if selection_print is False:
