@@ -8,7 +8,9 @@
 
 ### This tool
 
-**mpg-foss-α** is a Software tool used in the develpment of FOSS (fiber optic sensing systems) for applications by Carthage Space Sciences, WSGC, & NASA. Designed to interface with interrogator (gator) devices. This software is designed to interface with intrinsic fiber optic sensing technology, whereby the fiber optic cable itself is the sensor.
+**mpg-foss-α** is a Software tool used in the develpment of foss (fiber optic sensing systems) for applications by Carthage Space Sciences, WSGC, & NASA. Designed to interface with interrogator (gator) devices. This software is designed to interface with intrinsic fiber optic sensing technology, whereby the fiber optic cable itself is the sensor.
+
+Further into the development lifecycle, this program may be used in conjunction with a specific foss application called modal propellant gauging (mpg).
 
 ### Fiber optic sensing systems
 
