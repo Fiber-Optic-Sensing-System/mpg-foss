@@ -5,7 +5,7 @@ import sys, subprocess
 from formatmodule import bcolors, bsymbols
 
 modules_base = ['wheel', 'halo', 'GitPython']
-modules_dependencies = ['struct', 'pyusb', 'pandas', 'bitarray']
+modules_dependencies = ['pyusb', 'pandas', 'bitarray']
 modules_alt_name = {'GitPython': 'git', 'pyusb': 'usb.core'}
 project_url = "https://github.com/Fiber-Optic-Sensing-System/mpg-foss.git"
 fail = False
