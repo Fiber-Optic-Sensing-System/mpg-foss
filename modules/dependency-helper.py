@@ -118,8 +118,8 @@ def main():
         check_pip()
         basic()
         test('basic')
-        self_update()
         init_spinner()
+        self_update()
         advanced()
         test('advanced')
     except (KeyboardInterrupt, SystemExit):
