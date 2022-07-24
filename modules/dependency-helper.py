@@ -46,7 +46,7 @@ def self_update():
         tag = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
         print(f"{bsymbols.info}{bcolors.HEADER} git: Latest commit to this branch was {tag}{bcolors.ENDC}")
         print(f"{bsymbols.info}{bcolors.HEADER} {msg}{bcolors.ENDC}")
-    except git.exc.GitCommandError:
+    except (git.exc.GitCommandError, subprocess.SubprocessError):
         print(f"{bsymbols.info}{bcolors.FAIL} mpg-foss: Could not self update with git.{bcolors.ENDC}")
 
 def advanced():
