@@ -17,6 +17,8 @@ class bsymbols:
     waste = '\U0001F5A9'
 
 class prints:
+    def __init__(self):
+        self.spinner = None
 
     #Prints items nicely.
     def pretty(self, d, indent=0):
@@ -37,6 +39,46 @@ class prints:
                     print(f"{bcolors.OKGREEN}{str(v)}{bcolors.ENDC} ", end='')
                 if next(reversed(value.keys())) == k:
                     print()
+
+    def color_print(self, text, color = None):
+        match color:
+            case "info" | "magenta":
+                color = bcolors.HEADER
+            case "fail" | "red":
+                color = bcolors.FAIL
+            case "success" | "green":
+                color = bcolors.OKGREEN
+            case "cyan":
+                color = bcolors.OKCYAN
+            case _:
+                color = bcolors.HEADER
+        print(f"{bcolors.OKBLUE}{bsymbols.info}{color} {text}{bcolors.ENDC}")
+
+    def init_spinner(self, c = None):
+        try:
+            from halo import Halo
+            if c is None:
+                c = "cyan"
+            self.spinner = Halo(spinner='dots', animation='bounce', text_color=c)
+            spn = self.spinner
+            spn.start()
+        except ImportError:
+            self.color_print("Halo is not present and therefore spinners can't be used!", "red")
+
+    def spin_print(self, text, color = None):
+        try:
+            from halo import Halo
+            spn = self.spinner
+            if spn is None:
+                self.init_spinner()
+                spn = self.spinner
+            if color is None:
+                color = "magenta"
+            spn.text_color = color
+            spn.info(text)
+            spn.start()
+        except ImportError:
+            self.color_print("Halo is not present and therefore spin_print() can't be used!", "red")
 
     def title(self):
         print(f"{bcolors.OKGREEN}                                ____               {bcolors.ENDC}")
