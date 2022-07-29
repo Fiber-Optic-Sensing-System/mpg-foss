@@ -112,7 +112,7 @@ def main():
             #gator_version = pkt_header.get_version()
             #gator_type = pkt_header.get_gator_type()
             cog_data = pkt_cog.get_cog_data()
-            strain_data = pkt_cog.get_strain_data(cog_data)
+            strain_data = pkt_cog.get_strain_data()
             ### Get user decision on handling data ###
             if strain_selection is False: 
                 spinner.stop()

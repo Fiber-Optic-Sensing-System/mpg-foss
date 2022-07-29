@@ -156,6 +156,7 @@ class gatorpacket:
             self._len = 24
             self._num_sensors = 8
             self._cog_dictionary = {}
+            self._sensors = {}
 
         @property
         def cog_dictionary(self):
@@ -168,7 +169,6 @@ class gatorpacket:
         def get_cog_data(self):
             decode = self.outer_instance.raw_data[19:len(self.outer_instance.raw_data)]
             pad_text = lambda i: "0" if i < 10 else ""
-            sensors = {}
             bits = []
 
             for byte in decode:
@@ -182,18 +182,21 @@ class gatorpacket:
                     bit_string += str(bit)
                     if len(bit_string) == 18:
                         sensor_index += 1
-                        sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"] = {}
-                        sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"]['cog'] = bit_string
+                        self._sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"] = {}
+                        self._sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"]['cog'] = bit_string
                         bit_string = ""
                     if index % 19 == 18:
                         bit_string = str(bit)
-                        sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"]['err'] = bit_string
+                        self._sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"]['err'] = bit_string
                         bit_string = ""
-            return sensors
-        def get_strain_data(self, cog_data):
+            return self._sensors
+        def get_strain_data(self):
+            cog_string = self._sensors["sensor_01"].get('cog')
+            cog_value = int(cog_string, 2)
+            #print(cog_string, "This is cog string")
+            #print(cog_value, "This is cog value")
             #converting the defalt cog data bits into central wavelengths 
-            cog_data_bits, = self.struct.unpack('i', cog_data)
-            wavelengths = (1514 + cog_data_bits) / ((2 ** 18)*72)
+            wavelengths = (1514 + cog_value) / ((2 ** 18)*72)
             #The defalt central wavelength is that when the FBGs have undergone no strain or temperature difference(setting this as a constant for now; this will have to be experimentally determined later)
             default_cw = 1500
             therm_expan_coef = 25.5
@@ -203,6 +206,7 @@ class gatorpacket:
             #the strain optic coeffecient for a glass fiber is given as .22 in the User's Manual
             strain_optic_coefficent = .22
             strain = (((wavelengths-default_cw)/default_cw) - ((therm_expan_coef - thermo_optic_coef) * delta_temp)) / (1 - strain_optic_coefficent)
+            #print(strain, "This is strain")
             return strain
 #This class is used for generating fake gator packets.
 class packetsim:
