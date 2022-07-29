@@ -85,6 +85,7 @@ def main():
         printout = False
         selection_csv = False
         save_to_csv = False
+        strain_selection = False
         #Generate given num of packets.
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
         simdata = simpacket.generate_packets(num_packets)
@@ -111,32 +112,50 @@ def main():
             #gator_version = pkt_header.get_version()
             #gator_type = pkt_header.get_gator_type()
             cog_data = pkt_cog.get_cog_data()
+            strain_data = pkt_cog.get_strain_data(cog_data)
             ### Get user decision on handling data ###
+            if strain_selection is False: 
+                spinner.stop()
+                get_input1 = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Covert CoG data to Strain? [y/n]{bcolors.ENDC}") 
+                if get_input1 == ("y" or "Y"):
+                    strain_selection = True
+                    selection_print = True
+                    print(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Coverting CoG data to Strain...{bcolors.ENDC}")
+                elif get_input1 == ("n" or "N"):
+                    strain_selection = False
+                    selection_print = True 
+                    print(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Reading data as central wavelength CoG bits...{bcolors.ENDC}")
             if selection_print is False:
                 spinner.stop()
-                get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Print cog data? [y/n]{bcolors.ENDC}")
-                if get_input == ("y" or "Y"):
+                get_input2 = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Print cog data? [y/n]{bcolors.ENDC}")
+                if get_input2 == ("y" or "Y"):
                     selection_print = True
                     printout = True
                     print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Printing out cog data...{bcolors.ENDC}")
-                elif get_input == ("n" or "N"):
+                elif get_input2 == ("n" or "N"):
                     selection_print = True
                     printout = False
                     print(f"{bsymbols.info} {bcolors.FAIL}Not printing cog data.{bcolors.ENDC}")
             if selection_csv is False:
                 spinner.stop()
-                second_get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Write data to csv? [y/n]{bcolors.ENDC}")
-                if second_get_input == ("y" or "Y"):
+                get_input3 = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Write data to csv? [y/n]{bcolors.ENDC}")
+                if get_input3 == ("y" or "Y"):
                     selection_csv = True
                     save_to_csv = True
                     if os.path.exists(output_path) and save_to_csv is True:
                         os.remove(output_path)
                     print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Writing data to csv...{bcolors.ENDC}")
-                elif second_get_input == ("n" or "N"):
+                elif get_input3 == ("n" or "N"):
                     selection_csv = True
                     save_to_csv = False
                     print(f"{bsymbols.info} {bcolors.FAIL} Not reading to csv.{bcolors.ENDC}")
-            if printout is True:
+            if printout and strain_selection is True:
+                print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp:.4f}μs{bcolors.ENDC} collection time. Strain data ↴")
+                #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
+                #Pretty printing of cog data
+                pprint.pretty_sl(strain_data, 1)
+                print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
+            if printout is True and strain_selection is False:
                 print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp:.4f}μs{bcolors.ENDC} collection time. CoG data ↴")
                 #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
                 #Pretty printing of cog data
@@ -144,7 +163,22 @@ def main():
                 print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
             #TODO: Save to CSV here!
             #------------------------------------------------------------------------------------------------------------------------------------------#
-            if save_to_csv is True:
+            if save_to_csv and strain_selection is True:
+                spinner.start()
+                cog = {}
+                err = {}
+                for key, value in cog_data.items():
+                    for k, v in value.items():
+                        if k == "cog":
+                            cog[key] = v
+                        elif k == "err":
+                            err[key] = v
+                for key, value in cog_data.items():
+                    columns = {'packet':[pkt_num],'timestamp':[pkt_timestamp], 'sensor': [key], 'cog': [cog[key]], 'err': [err[key]]}
+                    frame = pd.DataFrame(columns)
+                    frame.set_index('packet', inplace=True)
+                    data_frames.append(frame)
+            if save_to_csv is True and strain_selection is False:
                 spinner.start()
                 cog = {}
                 err = {}

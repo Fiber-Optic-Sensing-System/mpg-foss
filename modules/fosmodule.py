@@ -150,6 +150,7 @@ class gatorpacket:
             return int(result)
 
     class data:
+        import struct
         def __init__(self, outer_instance):
             self.outer_instance = outer_instance
             self._len = 24
@@ -189,7 +190,20 @@ class gatorpacket:
                         sensors[f"sensor_{pad_text(sensor_index)}{sensor_index}"]['err'] = bit_string
                         bit_string = ""
             return sensors
-
+        def get_strain_data(self, cog_data):
+            #converting the defalt cog data bits into central wavelengths 
+            cog_data_bits, = self.struct.unpack('i', cog_data)
+            wavelengths = (1514 + cog_data_bits) / ((2 ** 18)*72)
+            #The defalt central wavelength is that when the FBGs have undergone no strain or temperature difference(setting this as a constant for now; this will have to be experimentally determined later)
+            default_cw = 1500
+            therm_expan_coef = 25.5
+            #thermo_optic_coef could not be found online...guessing here
+            thermo_optic_coef = 25.5
+            delta_temp = 0
+            #the strain optic coeffecient for a glass fiber is given as .22 in the User's Manual
+            strain_optic_coefficent = .22
+            strain = (((wavelengths-default_cw)/default_cw) - ((therm_expan_coef - thermo_optic_coef) * delta_temp)) / (1 - strain_optic_coefficent)
+            return strain
 #This class is used for generating fake gator packets.
 class packetsim:
     import struct
@@ -334,8 +348,4 @@ class packetsim:
         #Return the generated packets.
         return raw_packets
 
-
-    def generate_wavelength(self, cog_data):
-        something, = self.struct.unpack('i', cog_data)
-        wavelengths = (1514 + something) / ((2 ** 18)*72)
-        return wavelengths
+    
