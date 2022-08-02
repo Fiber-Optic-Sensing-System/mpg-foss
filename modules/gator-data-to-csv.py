@@ -6,9 +6,16 @@ Collects data from the Gator hardware (or simulator) and saves it to a CSV file.
 from halo import Halo
 from formatmodule import bcolors, bsymbols, prints, files
 from fosmodule import datahelper, gatorpacket, packetsim
+from graphicaltools import fftplot
+import matplotlib.pyplot as plt
+import numpy as np
+from numpy.fft import fft, ifft
 import pandas as pd
 import os
 import time
+
+from hanging_threads import start_monitoring
+start_monitoring(seconds_frozen=10, test_interval=100)
 
 #Initialize
 spinner = Halo(spinner='dots')
@@ -36,6 +43,12 @@ def detect_gator():
     time.sleep(0.65)
     #Detect gator HW using pyusb
     return False
+
+def produce_plot(x,y):
+    fig = plt.figure(figsize=(7,7))
+    for i in range(len(x)):
+        plt.plot(x[i],y[i])
+    return fig
 
 def main():
     #Globals
@@ -86,6 +99,8 @@ def main():
         selection_csv = False
         save_to_csv = False
         strain_selection = False
+        graph_selection = False
+        gen_graph = False
         #Generate given num of packets.
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
         simdata = simpacket.generate_packets(num_packets)
@@ -193,6 +208,28 @@ def main():
                     frame = pd.DataFrame(columns)
                     frame.set_index('packet', inplace=True)
                     data_frames.append(frame)
+            if graph_selection is False:
+                spinner.stop()
+                get_input4 = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Graph data? [y/n]{bcolors.ENDC}")
+                if get_input4 == ("y" or "Y"):
+                    gen_graph = True
+                    print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Graphing data...{bcolors.ENDC}")
+
+            if gen_graph is True:
+                x = []
+                y = []
+                for key, value in cog_data.items():
+                    x.append(pkt_timestamp)
+                    y.append(strain_data)
+                    #Y = fft(y)
+                fig = plt.figure(figsize=(7,7))
+                for i in range(len(x)):
+                    plt.plot(x[i],y[i])
+                f = produce_plot(x,y)
+                plt.show()
+                #print(y)   
+            print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
+
             #--------------------------------------------------------------------------------------------------------------------#
         if save_to_csv is True:
             for frame in data_frames:

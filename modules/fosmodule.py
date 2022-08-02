@@ -191,12 +191,12 @@ class gatorpacket:
                         bit_string = ""
             return self._sensors
         def get_strain_data(self):
-            cog_string = self._sensors["sensor_01"].get('cog')
-            cog_value = int(cog_string, 2)
+            strain_string = self._sensors["sensor_01"].get('cog')
+            strain_value = int(strain_string, 2)
             #print(cog_string, "This is cog string")
             #print(cog_value, "This is cog value")
             #converting the defalt cog data bits into central wavelengths 
-            wavelengths = (1514 + cog_value) / ((2 ** 18)*72)
+            wavelengths = (1514 + strain_value) / ((2 ** 18)*72)
             #The defalt central wavelength is that when the FBGs have undergone no strain or temperature difference(setting this as a constant for now; this will have to be experimentally determined later)
             default_cw = 1500
             therm_expan_coef = 25.5
