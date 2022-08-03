@@ -191,12 +191,6 @@ class gatorpacket:
                         bit_string = ""
             return self._sensors
         def get_strain_data(self):
-            strain_string = self._sensors["sensor_01"].get('cog')
-            strain_value = int(strain_string, 2)
-            #print(cog_string, "This is cog string")
-            #print(cog_value, "This is cog value")
-            #converting the defalt cog data bits into central wavelengths 
-            wavelengths = (1514 + strain_value) / ((2 ** 18)*72)
             #The defalt central wavelength is that when the FBGs have undergone no strain or temperature difference(setting this as a constant for now; this will have to be experimentally determined later)
             default_cw = 1500
             therm_expan_coef = 25.5
@@ -205,7 +199,22 @@ class gatorpacket:
             delta_temp = 0
             #the strain optic coeffecient for a glass fiber is given as .22 in the User's Manual
             strain_optic_coefficent = .22
-            strain = (((wavelengths-default_cw)/default_cw) - ((therm_expan_coef - thermo_optic_coef) * delta_temp)) / (1 - strain_optic_coefficent)
+           
+            st = {}
+            strain = []
+            for x in range(1,9):
+                strain_string = self._sensors["sensor_0{}".format(x)].get('cog')
+                strain_value = int(strain_string, 2)
+                st["sensor_0{}".format(x)] = strain_value
+                wavelengths = (1514 + strain_value) / ((2 ** 18)*72)
+                strain.append((((wavelengths-default_cw)/default_cw) - ((therm_expan_coef - thermo_optic_coef) * delta_temp)) / (1 - strain_optic_coefficent))
+                #print(strain, "This is a strain value")
+            #print(st)
+            #print(strain, "This is strain value")
+            #print(cog_string, "This is cog string")
+            #print(cog_value, "This is cog value")
+            #converting the defalt cog data bits into central wavelengths 
+            
             #print(strain, "This is strain")
             return strain
 #This class is used for generating fake gator packets.

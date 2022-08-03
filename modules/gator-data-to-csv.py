@@ -9,6 +9,7 @@ from fosmodule import datahelper, gatorpacket, packetsim
 from graphicaltools import fftplot
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 from numpy.fft import fft, ifft
 import pandas as pd
 import os
@@ -22,9 +23,12 @@ spinner = Halo(spinner='dots')
 errorStatus = False
 date = time.strftime("%Y-%m-%d")
 f = files()
-output_path = f.next_path(f"./data/out/{date}_run-%s.csv")
+output_path = f.next_path(f"./data/out/csv files/{date}_run-%s.csv")
+output_path_png = f.next_path(f"./data/out/png files/{date}_run-%s.csv")
+
 num_packets = 1
 collectDuration = 0
+this_plot = plt.figure(figsize=(7,7))
 
 def error_check():
     global errorStatus
@@ -43,13 +47,13 @@ def detect_gator():
     time.sleep(0.65)
     #Detect gator HW using pyusb
     return False
-
+"""
 def produce_plot(x,y):
     fig = plt.figure(figsize=(7,7))
     for i in range(len(x)):
         plt.plot(x[i],y[i])
     return fig
-
+"""
 def main():
     #Globals
     global errorStatus
@@ -57,6 +61,7 @@ def main():
     global collectDuration
     global num_packets
     global output_path
+    global this_plot
 
     #Initialize
     spinner.start()
@@ -180,19 +185,21 @@ def main():
             #------------------------------------------------------------------------------------------------------------------------------------------#
             if save_to_csv and strain_selection is True:
                 spinner.start()
-                cog = {}
+                
                 err = {}
+
                 for key, value in cog_data.items():
                     for k, v in value.items():
-                        if k == "cog":
-                            cog[key] = v
-                        elif k == "err":
+                        if k == "err":
                             err[key] = v
+
+                index = 0
                 for key, value in cog_data.items():
-                    columns = {'packet':[pkt_num],'timestamp':[pkt_timestamp], 'sensor': [key], 'cog': [cog[key]], 'err': [err[key]]}
+                    columns = {'packet':[pkt_num],'timestamp':[pkt_timestamp], 'sensor': [key], 'err': [err[key]], 'strain': [strain_data[index]]}
                     frame = pd.DataFrame(columns)
                     frame.set_index('packet', inplace=True)
                     data_frames.append(frame)
+                    index += 1
             if save_to_csv is True and strain_selection is False:
                 spinner.start()
                 cog = {}
@@ -212,24 +219,32 @@ def main():
                 spinner.stop()
                 get_input4 = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Graph data? [y/n]{bcolors.ENDC}")
                 if get_input4 == ("y" or "Y"):
+                    graph_selection = True
                     gen_graph = True
                     print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Graphing data...{bcolors.ENDC}")
-
+            
             if gen_graph is True:
                 x = []
                 y = []
+                plotX = []
+                plotY = []
                 for key, value in cog_data.items():
                     x.append(pkt_timestamp)
                     y.append(strain_data)
                     #Y = fft(y)
-                fig = plt.figure(figsize=(7,7))
+                j = 0
                 for i in range(len(x)):
-                    plt.plot(x[i],y[i])
-                f = produce_plot(x,y)
-                plt.show()
-                #print(y)   
-            print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
+                    plotX.append(x[i])
+                    plotY.append(y[i][j])
+                    j += 1
+                
+                rng = np.random.RandomState(0)
+                colors = rng.rand(len(x))
 
+                plt.scatter(plotX,plotY, c = colors)
+                plt.savefig("examplegraph.png")
+                #print(y)   
+            
             #--------------------------------------------------------------------------------------------------------------------#
         if save_to_csv is True:
             for frame in data_frames:
