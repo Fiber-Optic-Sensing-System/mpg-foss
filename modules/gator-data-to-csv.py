@@ -101,9 +101,12 @@ def main():
         printout = False
         selection_csv = False
         save_to_csv = False
+        strain_input = False
+        strain_input_print = False
         strain_selection = False
         graph_selection = False
         gen_graph = False
+        gen_csv = False
         #Generate given num of packets.
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
         simdata = simpacket.generate_packets(num_packets)
@@ -132,16 +135,18 @@ def main():
             cog_data = pkt_cog.get_cog_data()
             strain_data = pkt_cog.get_strain_data()
             ### Get user decision on handling data ###
-            if strain_selection is False: 
+            if strain_input is False: 
                 spinner.stop()
                 get_input1 = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Covert CoG data to Strain? [y/n]{bcolors.ENDC}") 
                 if get_input1 == ("y" or "Y"):
+                    strain_input = True
                     strain_selection = True
-                    selection_print = True
+                    strain_input_print = True 
                     print(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Coverting CoG data to Strain...{bcolors.ENDC}")
                 elif get_input1 == ("n" or "N"):
+                    strain_input = True
+                    strain_input_print = False
                     strain_selection = False
-                    selection_print = True 
                     print(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Reading data as central wavelength CoG bits...{bcolors.ENDC}")
             if selection_print is False:
                 spinner.stop()
@@ -167,13 +172,27 @@ def main():
                     selection_csv = True
                     save_to_csv = False
                     print(f"{bsymbols.info} {bcolors.FAIL} Not reading to csv.{bcolors.ENDC}")
-            if printout and strain_selection is True:
+            if strain_input_print is True and strain_input is True:
+                strain_selection = True
                 print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp:.4f}μs{bcolors.ENDC} collection time. Strain data ↴")
                 #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
                 #Pretty printing of cog data
-                pprint.pretty_sl(strain_data, 1)
+                err = {}
+                strain_dict = []
+                for key, value in cog_data.items():
+                    for k, v in value.items():
+                        if k == "err":
+                            err[key] = v
+
+                index = 0
+                for key, value in cog_data.items():     
+                    strain_dict.append(strain_data)
+                    index += 1   
+                
+                pprint.pretty_sl(strain_dict, 1)
                 print(f" {bcolors.OKBLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{bcolors.ENDC}")
-            if printout is True and strain_selection is False:
+            if strain_input_print is True and strain_input is False:
+                strain_selection = False
                 print(f" Packet num: {bcolors.BOLD}{pkt_num}{bcolors.ENDC} ⇒ recorded at {bcolors.BOLD}{pkt_timestamp:.4f}μs{bcolors.ENDC} collection time. CoG data ↴")
                 #print(f" DEBUG: Payload len: {pkt_payload_len} bytes | Gator type: {gator_type} | Gator version: {gator_version}") #Debug
                 #Pretty printing of cog data
@@ -183,7 +202,7 @@ def main():
             #------------------------------------------------------------------------------------------------------------------------------------------#
             if save_to_csv and strain_selection is True:
                 spinner.start()
-                
+                gen_csv = True 
                 err = {}
 
                 for key, value in cog_data.items():
@@ -201,6 +220,7 @@ def main():
                     index += 1
             if save_to_csv is True and strain_selection is False:
                 spinner.start()
+                gen_csv = True
                 cog = {}
                 err = {}
                 for key, value in cog_data.items():
@@ -221,6 +241,10 @@ def main():
                     graph_selection = True
                     gen_graph = True
                     print(f"{bsymbols.info} {bcolors.OKBLUE}{bcolors.BOLD}mpg-foss: Graphing data...{bcolors.ENDC}")
+                elif get_input4 == ("n" or "N"):
+                    graph_selection = True
+                    gen_graph = False
+                    print(f"{bsymbols.info} {bcolors.FAIL}Not graphing data.{bcolors.ENDC}")
             
             if gen_graph is True:
                 x = []
@@ -245,7 +269,7 @@ def main():
                 #print(y)   
             
             #--------------------------------------------------------------------------------------------------------------------#
-        if save_to_csv is True:
+        if gen_csv is True:
             for frame in data_frames:
                 #frame = pd.concat(frame, keys=["Packet number n"])
                 frame.to_csv(output_path, mode = 'a', header = not os.path.exists(output_path))
