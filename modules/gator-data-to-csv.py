@@ -15,15 +15,13 @@ import pandas as pd
 import os
 import time
 
-from hanging_threads import start_monitoring
-start_monitoring(seconds_frozen=10, test_interval=100)
 
 #Initialize
 spinner = Halo(spinner='dots')
 errorStatus = False
 date = time.strftime("%Y-%m-%d")
 f = files()
-output_path = f.next_path(f"./data/out/csv files/{date}_run-%s.csv")
+output_path = f.next_path(f"./data/out/{date}_run-%s.csv")
 output_path_png = f.next_path(f"./data/out/png files/{date}_run-%s.csv")
 
 num_packets = 1
@@ -197,6 +195,7 @@ def main():
                 for key, value in cog_data.items():
                     columns = {'packet':[pkt_num],'timestamp':[pkt_timestamp], 'sensor': [key], 'err': [err[key]], 'strain': [strain_data[index]]}
                     frame = pd.DataFrame(columns)
+                   # frame2 = frame.sort_values('sensor')
                     frame.set_index('packet', inplace=True)
                     data_frames.append(frame)
                     index += 1
