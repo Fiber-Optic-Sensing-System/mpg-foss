@@ -33,20 +33,20 @@ S4 = abs(fft(s4));
 f = f(1,1:25);
 
 %% FRFs that are possible
-% S12 = S1/S2;
-% S13 = S1/S3;
-% S14 = S1/S4;
-% S21 = S2/S1;
-% S31 = S3/S1;
-% S41 = S4/S1;
-% S23 = S2/S3;
-% S32 = S3/S2;
-% S24 = S2/S4;
-% S42 = S4/S2;
-% S34 = S3/S4;
-% S43 = S4/S3;
+S12 = S1./S2;
+S13 = S1./S3;
+S14 = S1./S4;
+S21 = S2./S1;
+S31 = S3./S1;
+S41 = S4./S1;
+S23 = S2./S3;
+S32 = S3./S2;
+S24 = S2./S4;
+S42 = S4./S2;
+S34 = S3./S4;
+S43 = S4./S3;
 
 
 %% plot 
 sensorplot
-
+sensorplotFRF
