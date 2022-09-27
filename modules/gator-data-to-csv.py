@@ -9,6 +9,9 @@ from fosmodule import datahelper, gatorpacket, packetsim
 import pandas as pd
 import os
 import time
+import usb.core
+import usb.util
+import sys
 
 #Initialize
 spinner = Halo(spinner='dots')
@@ -33,9 +36,25 @@ def error_check():
 
 def detect_gator():
     print(f"{bcolors.ENDC}{bsymbols.info} {bcolors.HEADER}mpg-foss: Searching for gator hardware...{bcolors.ENDC}")
+    endpoint = None
     time.sleep(0.65)
-    #Detect gator HW using pyusb
-    return False
+    # Find the Gator via vID & pID
+    dev = usb.core.find(idVendor=0x0403, idProduct=0x6010)
+    # Set endpoint if it was found
+    if dev is not None:
+        retval = True
+        cfg = dev.get_active_configuration()
+        intf = cfg[(0,0)]
+        endpoint = usb.util.find_descriptor(
+            intf,
+            # match the first OUT endpoint
+            custom_match = \
+            lambda e: \
+                usb.util.endpoint_direction(e.bEndpointAddress) == \
+                usb.util.ENDPOINT_OUT)
+        assert endpoint is not None
+        #endpoint.
+    return endpoint
 
 def main():
     #Globals
@@ -51,8 +70,8 @@ def main():
 
     #Try to detect hardware
     try:
-        gator_found = detect_gator()
-        if gator_found == False:
+        endpoint = detect_gator()
+        if endpoint == None:
             print(f"{bsymbols.info} {bcolors.FAIL}mpg-foss: No gator hardware found!{bcolors.ENDC}")
             selection_pkts = False
             while selection_pkts == False:
@@ -66,8 +85,24 @@ def main():
                     print(f"{bsymbols.info} {bcolors.FAIL}Enter an integer value!{bcolors.ENDC}")
             spinner.start()
         else:
-            #Collect real gator data into buffer.
-            pass
+            print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Gator detected!{bcolors.ENDC}")
+            collectDuration = 0
+            while collectDuration != 0:
+                spinner.stop()
+                get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Duration to collect (seconds)? [int]{bcolors.ENDC}")
+                get_input = get_input.strip()
+                if get_input.isnumeric() == True:
+                    collectDuration = int(get_input)
+                else:
+                    print(f"{bsymbols.info} {bcolors.FAIL}Enter an integer value!{bcolors.ENDC}")
+            spinner.start()
+            #Perform the collection
+            try:
+                data = endpoint.read(endpoint.bEndpointAddress,endpoint.wMaxPacketSize)
+            except usb.core.USBError as e:
+                print ("USBError: " + str(e))
+                sys.exit()
+
     except(KeyboardInterrupt, SystemExit):
         spinner.text_color = 'red'
         spinner.fail("mpg-foss: Process aborted.")
