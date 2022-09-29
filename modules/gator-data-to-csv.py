@@ -12,6 +12,7 @@ import time
 import usb.core
 import usb.util
 import sys
+import array
 
 #Initialize
 spinner = Halo(spinner='dots')
@@ -42,19 +43,27 @@ def detect_gator():
     dev = usb.core.find(idVendor=0x0403, idProduct=0x6010)
     # Set endpoint if it was found
     if dev is not None:
-        retval = True
+        if dev.is_kernel_driver_active(0):
+            try:
+                dev.detach_kernel_driver(0)
+            except usb.core.USBError as e:
+                sys.exit("Could not detach kernel driver: ")
+        try:
+                usb.util.claim_interface(dev, 0)
+                print(f"{bcolors.ENDC}{bsymbols.info} {bcolors.HEADER}mpg-foss: Claimed device...{bcolors.ENDC}")
+        except:
+                endpoint = dev[0][(0,0)][0]
         cfg = dev.get_active_configuration()
         intf = cfg[(0,0)]
         endpoint = usb.util.find_descriptor(
             intf,
-            # match the first OUT endpoint
+            # Match the first IN endpoint
             custom_match = \
             lambda e: \
                 usb.util.endpoint_direction(e.bEndpointAddress) == \
-                usb.util.ENDPOINT_OUT)
+                usb.util.ENDPOINT_IN)
         assert endpoint is not None
-        #endpoint.
-    return endpoint
+    return dev, endpoint
 
 def main():
     #Globals
@@ -70,8 +79,13 @@ def main():
 
     #Try to detect hardware
     try:
-        endpoint = detect_gator()
-        if endpoint == None:
+        gator_tuple = detect_gator()
+        dev = gator_tuple[0]
+        endpoint = gator_tuple[1]
+
+        print(endpoint)
+
+        if dev == None:
             print(f"{bsymbols.info} {bcolors.FAIL}mpg-foss: No gator hardware found!{bcolors.ENDC}")
             selection_pkts = False
             while selection_pkts == False:
@@ -87,7 +101,7 @@ def main():
         else:
             print(f"{bsymbols.info} {bcolors.OKGREEN}mpg-foss: Gator detected!{bcolors.ENDC}")
             collectDuration = 0
-            while collectDuration != 0:
+            while collectDuration == 0:
                 spinner.stop()
                 get_input = input(f"{bsymbols.info} {bcolors.OKCYAN}mpg-foss: Duration to collect (seconds)? [int]{bcolors.ENDC}")
                 get_input = get_input.strip()
@@ -95,13 +109,21 @@ def main():
                     collectDuration = int(get_input)
                 else:
                     print(f"{bsymbols.info} {bcolors.FAIL}Enter an integer value!{bcolors.ENDC}")
+            print(f"{bsymbols.info} {bcolors.OKCYAN}Collecting run...{bcolors.ENDC}")
             spinner.start()
-            #Perform the collection
-            try:
-                data = endpoint.read(endpoint.bEndpointAddress,endpoint.wMaxPacketSize)
-            except usb.core.USBError as e:
-                print ("USBError: " + str(e))
-                sys.exit()
+            #Perform the collection for the duration
+            # Initialization
+            rxBytes = array.array('B', [0]) * (64 * 8)
+            rxBuffer = array.array('B')
+            #Run a loop for the specified duration in seconds:
+            start_time = time.time()
+            while time.time() - start_time < collectDuration:
+                dev.read(endpoint.bEndpointAddress, rxBytes)
+                rxBuffer.extend(rxBytes)
+            dataBytes = bytearray(rxBuffer)
+            dataBytes.reverse() #May need to reverse or rewrite the datahelper
+            print(dataBytes)
+            dev.reset()
 
     except(KeyboardInterrupt, SystemExit):
         spinner.text_color = 'red'
@@ -121,16 +143,20 @@ def main():
         selection_csv = False
         save_to_csv = False
         #Generate given num of packets.
-        print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
-        simdata = simpacket.generate_packets(num_packets)
-        if(simdata == None):
-            errorStatus = True
+        if dev == None:
+            print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Generating {num_packets} packets...{bcolors.ENDC}")
+            data = simpacket.generate_packets(num_packets)
+            if(data == None):
+                errorStatus = True
+        else:
+            data = dataBytes
         error_check()
-        datum.raw_data = simdata
+        datum.raw_data = data
         #----------------------------------------------------------------------------------------------#
         ### Next, sort datum for packets ###
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Parsing packets...{bcolors.ENDC}")
         packets = datum.parse()
+        print(packets)
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: {len(packets)} packets found...{bcolors.ENDC}", end="")
         #----------------------------------------------------------------------------------------------#
         ### Then get, values from each packet ###
