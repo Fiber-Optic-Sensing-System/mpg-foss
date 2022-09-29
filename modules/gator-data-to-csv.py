@@ -122,7 +122,7 @@ def main():
                 rxBuffer.extend(rxBytes)
             dataBytes = bytearray(rxBuffer)
             dataBytes.reverse() #May need to reverse or rewrite the datahelper
-            print(dataBytes)
+            #print(dataBytes)
             dev.reset()
 
     except(KeyboardInterrupt, SystemExit):
@@ -156,7 +156,6 @@ def main():
         ### Next, sort datum for packets ###
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: Parsing packets...{bcolors.ENDC}")
         packets = datum.parse()
-        print(packets)
         print(f"{bsymbols.info} {bcolors.HEADER}mpg-foss: {len(packets)} packets found...{bcolors.ENDC}", end="")
         #----------------------------------------------------------------------------------------------#
         ### Then get, values from each packet ###
